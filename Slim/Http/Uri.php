@@ -110,7 +110,7 @@ class Uri implements UriInterface
         $host,
         $port = null,
         $path = '/',
-        $query = '',
+        string $query = '',
         $fragment = '',
         $user = '',
         $password = ''
@@ -216,7 +216,7 @@ class Uri implements UriInterface
         // Query string
         $queryString = $env->get('QUERY_STRING', '');
         if ($queryString === '') {
-            $queryString = parse_url('http://example.com' . $env->get('REQUEST_URI'), PHP_URL_QUERY);
+            $queryString = parse_url('http://example.com' . $env->get('REQUEST_URI'), PHP_URL_QUERY) ?? '';
         }
 
         // Fragment
@@ -711,7 +711,7 @@ class Uri implements UriInterface
      *
      * @return string The percent-encoded query string.
      */
-    protected function filterQuery($query)
+    protected function filterQuery(string $query)
     {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/\?]+|%(?![A-Fa-f0-9]{2}))/',
