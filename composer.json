@@ -16,10 +16,10 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
-        "phpwatch/simple-container": "^v1.1.0",
+        "phpwatch/simple-container": "^2.0.0",
         "psr/http-message": "^1.0",
         "nikic/fast-route": "^1.0",
-        "psr/container": "^1.0"
+        "psr/container": "^2.0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5.9"
