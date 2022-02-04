@@ -617,7 +617,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string|null
      */
-    public function getMediaType()
+    public function getMediaType(): ?string
     {
         $contentType = $this->getContentType();
         if ($contentType) {
@@ -1007,7 +1007,7 @@ class Request extends Message implements ServerRequestInterface
             return null;
         }
 
-        $mediaType = $this->getMediaType();
+        $mediaType = (string) $this->getMediaType();
 
         // Check if this specific media type has a parser registered first
         if (!isset($this->bodyParsers[$mediaType])) {
