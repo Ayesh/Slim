@@ -8,13 +8,14 @@
 namespace Slim\Tests\Http;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
 use ReflectionProperty;
 use Slim\Http\Cookies;
 use stdClass;
 
-class CookiesTest extends PHPUnit_Framework_TestCase
+class CookiesTest extends TestCase
 {
     public function testConstructor()
     {

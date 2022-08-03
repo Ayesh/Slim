@@ -7,11 +7,12 @@
 
 namespace Slim\Tests\Http;
 
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use ReflectionProperty;
 use Slim\Http\RequestBody;
 
-class RequestBodyTest extends PHPUnit_Framework_TestCase
+class RequestBodyTest extends TestCase
 {
     /** @var string */
     // @codingStandardsIgnoreStart
@@ -26,14 +27,14 @@ class RequestBodyTest extends PHPUnit_Framework_TestCase
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->body = new RequestBody();
         $this->body->write($this->text);
         $this->body->rewind();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (is_resource($this->stream) === true) {
             fclose($this->stream);

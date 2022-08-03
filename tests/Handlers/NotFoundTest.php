@@ -7,14 +7,14 @@
 
 namespace Slim\Tests\Handlers;
 
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Slim\Handlers\NotFound;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Uri;
 
-class NotFoundTest extends PHPUnit_Framework_TestCase
+class NotFoundTest extends TestCase
 {
     public function notFoundProvider()
     {
@@ -49,26 +49,26 @@ class NotFoundTest extends PHPUnit_Framework_TestCase
     {
         $errorMock = $this->getMockBuilder(NotFound::class)->setMethods(['determineContentType'])->getMock();
         $errorMock->method('determineContentType')
-            ->will($this->returnValue('unknown/type'));
+            ->willReturn('unknown/type');
 
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
 
-        $this->setExpectedException('\UnexpectedValueException');
+        $this->expectException(\UnexpectedValueException::class);
         $errorMock->__invoke($req, new Response(), ['POST']);
     }
 
     /**
      * @param string $method
      *
-     * @return PHPUnit_Framework_MockObject_MockObject|Request
+     * @return MockObject|Request
      */
     protected function getRequest($method, $contentType = 'text/html')
     {
         $uri = new Uri('http', 'example.com', 80, '/notfound');
 
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
-        $req->expects($this->once())->method('getHeaderLine')->will($this->returnValue($contentType));
-        $req->expects($this->any())->method('getUri')->will($this->returnValue($uri));
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $req->expects($this->once())->method('getHeaderLine')->willReturn($contentType);
+        $req->expects($this->any())->method('getUri')->willReturn($uri);
 
         return $req;
     }

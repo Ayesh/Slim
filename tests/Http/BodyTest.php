@@ -8,11 +8,12 @@
 namespace Slim\Tests\Http;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use ReflectionProperty;
 use Slim\Http\Body;
 
-class BodyTest extends PHPUnit_Framework_TestCase
+class BodyTest extends TestCase
 {
     /**
      * @var string
@@ -25,7 +26,7 @@ class BodyTest extends PHPUnit_Framework_TestCase
      */
     protected $stream;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (is_resource($this->stream) === true) {
             fclose($this->stream);
@@ -60,12 +61,10 @@ class BodyTest extends PHPUnit_Framework_TestCase
         $this->assertSame($this->stream, $bodyStream->getValue($body));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testConstructorInvalidStream()
     {
         $this->stream = 'foo';
+        $this->expectException(InvalidArgumentException::class);
         $body = new Body($this->stream);
     }
 

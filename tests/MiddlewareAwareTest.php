@@ -7,6 +7,7 @@
 
 namespace Slim\Tests;
 
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use RuntimeException;
 use Slim\Http\Body;
@@ -16,7 +17,7 @@ use Slim\Http\Response;
 use Slim\Http\Uri;
 use Slim\Tests\Mocks\Stackable;
 
-class MiddlewareAwareTest extends PHPUnit_Framework_TestCase
+class MiddlewareAwareTest extends TestCase
 {
     public function testSeedsMiddlewareStack()
     {

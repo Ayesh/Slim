@@ -8,6 +8,8 @@
 namespace Slim\Tests\Handlers;
 
 use Exception;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
@@ -17,7 +19,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use UnexpectedValueException;
 
-class ErrorTest extends PHPUnit_Framework_TestCase
+class ErrorTest extends TestCase
 {
     public function errorProvider()
     {
@@ -67,9 +69,6 @@ class ErrorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, strpos((string)$res->getBody(), $startOfBody));
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
     public function testNotFoundContentType()
     {
         $errorMock = $this->getMockBuilder(Error::class)->setMethods(['determineContentType'])->getMock();
@@ -79,7 +78,7 @@ class ErrorTest extends PHPUnit_Framework_TestCase
         $e = new Exception("Oops");
 
         $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
-
+        $this->expectException(UnexpectedValueException::class);
         $errorMock->__invoke($req, new Response(), $e);
     }
 
@@ -113,7 +112,7 @@ class ErrorTest extends PHPUnit_Framework_TestCase
         $renderHtmlExceptionorError = $class->getMethod('renderHtmlExceptionOrError');
         $renderHtmlExceptionorError->setAccessible(true);
 
-        $this->setExpectedException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $error = new Error();
         $renderHtmlExceptionorError->invokeArgs($error, ['foo']);
@@ -122,12 +121,12 @@ class ErrorTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $method
      *
-     * @return PHPUnit_Framework_MockObject_MockObject|Request
+     * @return MockObject|Request
      */
     protected function getRequest($method, $acceptHeader)
     {
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
-        $req->expects($this->once())->method('getHeaderLine')->will($this->returnValue($acceptHeader));
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $req->expects($this->once())->method('getHeaderLine')->willReturn($acceptHeader);
 
         return $req;
     }

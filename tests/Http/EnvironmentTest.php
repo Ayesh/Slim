@@ -7,16 +7,17 @@
 
 namespace Slim\Tests\Http;
 
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use Slim\Http\Environment;
 
-class EnvironmentTest extends PHPUnit_Framework_TestCase
+class EnvironmentTest extends TestCase
 {
     /**
      * Server settings for the default HTTP request
      * used by this script's tests.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $_SERVER['DOCUMENT_ROOT'] = '/var/www';
         $_SERVER['SCRIPT_NAME'] = '/foo/index.php';

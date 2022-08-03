@@ -8,13 +8,14 @@
 namespace Slim\Tests;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
 use RuntimeException;
 use Slim\Http\Uri;
 use Slim\Router;
 
-class RouterTest extends PHPUnit_Framework_TestCase
+class RouterTest extends TestCase
 {
     /**
      * @var Router
@@ -26,14 +27,14 @@ class RouterTest extends PHPUnit_Framework_TestCase
      */
     protected $cacheFile;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->router = new Router;
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
-        if (file_exists($this->cacheFile)) {
+        if ($this->cacheFile && file_exists($this->cacheFile)) {
             unlink($this->cacheFile);
         }
     }

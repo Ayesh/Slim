@@ -8,15 +8,15 @@
 namespace Slim\Tests\Handlers;
 
 use Exception;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Slim\Handlers\PhpError;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Throwable;
 use UnexpectedValueException;
 
-class PhpErrorTest extends PHPUnit_Framework_TestCase
+class PhpErrorTest extends TestCase
 {
     public function phpErrorProvider()
     {
@@ -50,8 +50,6 @@ class PhpErrorTest extends PHPUnit_Framework_TestCase
 
     /**
      * Test invalid method returns the correct code and content type
-     *
-     * @requires PHP 7.0
      * @dataProvider phpErrorProvider
      */
     public function testPhpErrorDisplayDetails($acceptHeader, $contentType, $startOfBody)
@@ -75,11 +73,11 @@ class PhpErrorTest extends PHPUnit_Framework_TestCase
     {
         $errorMock = $this->getMockBuilder(PhpError::class)->setMethods(['determineContentType'])->getMock();
         $errorMock->method('determineContentType')
-            ->will($this->returnValue('unknown/type'));
+            ->willReturn('unknown/type');
 
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
 
-        $this->setExpectedException('\UnexpectedValueException');
+        $this->expectException(UnexpectedValueException::class);
         $errorMock->__invoke($req, new Response(), new Exception());
     }
 
@@ -96,7 +94,7 @@ class PhpErrorTest extends PHPUnit_Framework_TestCase
 
         /** @var Throwable $throwable */
         $throwable = $this->getMock(
-            '\Throwable',
+            Throwable::class,
             ['getCode', 'getMessage', 'getFile', 'getLine', 'getTraceAsString', 'getPrevious']
         );
 
@@ -120,7 +118,7 @@ class PhpErrorTest extends PHPUnit_Framework_TestCase
 
         /** @var Throwable $throwable */
         $throwable = $this->getMock(
-            '\Throwable',
+            Throwable::class,
             ['getCode', 'getMessage', 'getFile', 'getLine', 'getTraceAsString', 'getPrevious']
         );
 
@@ -160,12 +158,12 @@ class PhpErrorTest extends PHPUnit_Framework_TestCase
     /**
      * @param string $method
      *
-     * @return PHPUnit_Framework_MockObject_MockObject|Request
+     * @return MockObject|Request
      */
     protected function getRequest($method, $acceptHeader)
     {
         $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
-        $req->expects($this->once())->method('getHeaderLine')->will($this->returnValue($acceptHeader));
+        $req->expects($this->once())->method('getHeaderLine')->willReturn($acceptHeader);
 
         return $req;
     }

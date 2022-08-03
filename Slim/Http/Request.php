@@ -253,7 +253,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         if ($this->method === null) {
             $this->method = $this->originalMethod;
@@ -273,7 +273,7 @@ class Request extends Message implements ServerRequestInterface
             }
         }
 
-        return $this->method;
+        return $this->method ?? 'GET';
     }
 
     /**
@@ -487,7 +487,7 @@ class Request extends Message implements ServerRequestInterface
             $basePath = '';
         }
         $path = $this->uri->getPath();
-        $path = $basePath . '/' . ltrim($path, '/');
+        $path = $basePath . '/' . ltrim($path ?? '', '/');
 
         $query = $this->uri->getQuery();
         if ($query) {

@@ -11,7 +11,6 @@ use ArrayAccess;
 use Psr\Container\ContainerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use InvalidArgumentException;
-use Pimple\Container as PimpleContainer;
 use Slim\Exception\ContainerException as SlimContainerException;
 use Slim\Exception\ContainerValueNotFoundException;
 
@@ -32,7 +31,7 @@ use Slim\Exception\ContainerValueNotFoundException;
  *  `notAllowedHandler` a callable with the signature: function($request, $response, $allowedHttpMethods)
  *  `callableResolver`  an instance of \Slim\Interfaces\CallableResolverInterface
  */
-class Container extends PimpleContainer implements ContainerInterface
+class Container extends \PHPWatch\SimpleContainer\Container
 {
     /**
      * Default settings
@@ -132,7 +131,7 @@ class Container extends PimpleContainer implements ContainerInterface
     {
         $trace = $exception->getTrace()[0];
 
-        return $trace['class'] === PimpleContainer::class && $trace['function'] === 'offsetGet';
+        return $trace['class'] === \PHPWatch\SimpleContainer\Container::class && $trace['function'] === 'offsetGet';
     }
 
     /**
@@ -143,7 +142,7 @@ class Container extends PimpleContainer implements ContainerInterface
      *
      * @return boolean
      */
-    public function has($id)
+    public function has($id): bool
     {
         return $this->offsetExists($id);
     }

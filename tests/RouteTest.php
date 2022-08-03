@@ -8,6 +8,7 @@
 namespace Slim\Tests;
 
 use Exception;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use Slim\Container;
 use Slim\DeferredCallable;
@@ -22,7 +23,7 @@ use Slim\Tests\Mocks\CallableTest;
 use Slim\Tests\Mocks\InvocationStrategyTest;
 use Slim\Tests\Mocks\MiddlewareStub;
 
-class RouteTest extends PHPUnit_Framework_TestCase
+class RouteTest extends TestCase
 {
     public function routeFactory()
     {

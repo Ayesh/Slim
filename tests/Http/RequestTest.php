@@ -8,6 +8,7 @@
 namespace Slim\Tests\Http;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\MethodProphecy;
@@ -22,7 +23,7 @@ use Slim\Http\RequestBody;
 use Slim\Http\UploadedFile;
 use Slim\Http\Uri;
 
-class RequestTest extends PHPUnit_Framework_TestCase
+class RequestTest extends TestCase
 {
     public function requestFactory($envData = [])
     {

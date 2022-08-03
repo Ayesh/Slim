@@ -288,7 +288,7 @@ class App
      * @throws Exception
      * @throws Throwable
      */
-    public function run($silent = false)
+    public function run(bool $silent = false)
     {
         $response = $this->container->get('response');
 
