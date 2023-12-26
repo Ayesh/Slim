@@ -8,6 +8,7 @@
 namespace Slim;
 
 use Psr\Container\ContainerInterface;
+use Slim\Interfaces\RouteInterface;
 
 abstract class Routable
 {
@@ -89,7 +90,7 @@ abstract class Routable
      *
      * @return static
      */
-    public function add($callable)
+    public function add($callable): static
     {
         $this->middleware[] = new DeferredCallable($callable, $this->container);
         return $this;

@@ -21,7 +21,7 @@ use UnexpectedValueException;
 
 class ErrorTest extends TestCase
 {
-    public static static function errorProvider(): array {
+    public static function errorProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],

@@ -221,7 +221,7 @@ class UploadedFilesTest extends TestCase
         $this->assertFileNotExists($uploadedFile->file);
     }
 
-    public static static function providerCreateFromEnvironment(): array {
+    public static function providerCreateFromEnvironment(): array {
         return [
             // no nest: <input name="avatar" type="file">
             [

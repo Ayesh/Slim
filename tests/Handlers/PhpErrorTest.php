@@ -18,7 +18,7 @@ use UnexpectedValueException;
 
 class PhpErrorTest extends TestCase
 {
-    public static static static static function phpErrorProvider(): array {
+    public static function phpErrorProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
