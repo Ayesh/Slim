@@ -30,8 +30,7 @@ class CollectionTest extends TestCase
         $this->property->setAccessible(true);
     }
 
-    public function testInitializeWithData()
-    {
+    public function testInitializeWithData(): void {
         $bag = new Collection(['foo' => 'bar']);
         $bagProperty = new ReflectionProperty($bag, 'data');
         $bagProperty->setAccessible(true);
@@ -39,36 +38,31 @@ class CollectionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $bagProperty->getValue($bag));
     }
 
-    public function testSet()
-    {
+    public function testSet(): void {
         $this->bag->set('foo', 'bar');
         $this->assertArrayHasKey('foo', $this->property->getValue($this->bag));
         $bag =  $this->property->getValue($this->bag);
         $this->assertEquals('bar', $bag['foo']);
     }
 
-    public function testOffsetSet()
-    {
+    public function testOffsetSet(): void {
         $this->bag['foo'] = 'bar';
         $this->assertArrayHasKey('foo', $this->property->getValue($this->bag));
         $bag = $this->property->getValue($this->bag);
         $this->assertEquals('bar', $bag['foo']);
     }
 
-    public function testGet()
-    {
+    public function testGet(): void {
         $this->property->setValue($this->bag, ['foo' => 'bar']);
         $this->assertEquals('bar', $this->bag->get('foo'));
     }
 
-    public function testGetWithDefault()
-    {
+    public function testGetWithDefault(): void {
         $this->property->setValue($this->bag, ['foo' => 'bar']);
         $this->assertEquals('default', $this->bag->get('abc', 'default'));
     }
 
-    public function testReplace()
-    {
+    public function testReplace(): void {
         $this->bag->replace([
             'abc' => '123',
             'foo' => 'bar',
@@ -80,8 +74,7 @@ class CollectionTest extends TestCase
         $this->assertEquals('bar', $bag['foo']);
     }
 
-    public function testAll()
-    {
+    public function testAll(): void {
         $data = [
             'abc' => '123',
             'foo' => 'bar',
@@ -90,8 +83,7 @@ class CollectionTest extends TestCase
         $this->assertEquals($data, $this->bag->all());
     }
 
-    public function testKeys()
-    {
+    public function testKeys(): void {
         $data = [
             'abc' => '123',
             'foo' => 'bar',
@@ -100,21 +92,18 @@ class CollectionTest extends TestCase
         $this->assertEquals(['abc', 'foo'], $this->bag->keys());
     }
 
-    public function testHas()
-    {
+    public function testHas(): void {
         $this->property->setValue($this->bag, ['foo' => 'bar']);
         $this->assertTrue($this->bag->has('foo'));
         $this->assertFalse($this->bag->has('abc'));
     }
 
-    public function testOffsetExists()
-    {
+    public function testOffsetExists(): void {
         $this->property->setValue($this->bag, ['foo' => 'bar']);
         $this->assertTrue(isset($this->bag['foo']));
     }
 
-    public function testRemove()
-    {
+    public function testRemove(): void {
         $data = [
             'abc' => '123',
             'foo' => 'bar',
@@ -124,8 +113,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['abc' => '123'], $this->property->getValue($this->bag));
     }
 
-    public function testOffsetUnset()
-    {
+    public function testOffsetUnset(): void {
         $data = [
             'abc' => '123',
             'foo' => 'bar',
@@ -136,8 +124,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['abc' => '123'], $this->property->getValue($this->bag));
     }
 
-    public function testClear()
-    {
+    public function testClear(): void {
         $data = [
             'abc' => '123',
             'foo' => 'bar',
@@ -147,8 +134,7 @@ class CollectionTest extends TestCase
         $this->assertEquals([], $this->property->getValue($this->bag));
     }
 
-    public function testCount()
-    {
+    public function testCount(): void {
         $this->property->setValue($this->bag, ['foo' => 'bar', 'abc' => '123']);
         $this->assertEquals(2, $this->bag->count());
     }

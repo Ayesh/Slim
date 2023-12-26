@@ -112,8 +112,7 @@ class Router implements RouterInterface
      *
      * @return string
      */
-    public function getBasePath()
-    {
+    public function getBasePath(): string {
         return $this->basePath;
     }
 
@@ -152,8 +151,7 @@ class Router implements RouterInterface
     /**
      * @param ContainerInterface $container
      */
-    public function setContainer(ContainerInterface $container)
-    {
+    public function setContainer(ContainerInterface $container): void {
         $this->container = $container;
     }
 
@@ -218,8 +216,7 @@ class Router implements RouterInterface
     /**
      * @return Dispatcher
      */
-    protected function createDispatcher()
-    {
+    protected function createDispatcher(): Dispatcher {
         if ($this->dispatcher) {
             return $this->dispatcher;
         }
@@ -247,8 +244,7 @@ class Router implements RouterInterface
     /**
      * @param Dispatcher $dispatcher
      */
-    public function setDispatcher(Dispatcher $dispatcher)
-    {
+    public function setDispatcher(Dispatcher $dispatcher): void {
         $this->dispatcher = $dispatcher;
     }
 
@@ -257,8 +253,7 @@ class Router implements RouterInterface
      *
      * @return Route[]
      */
-    public function getRoutes()
-    {
+    public function getRoutes(): array {
         return $this->routes;
     }
 
@@ -282,8 +277,7 @@ class Router implements RouterInterface
      *
      * @throws RuntimeException   If named route does not exist
      */
-    public function removeNamedRoute($name)
-    {
+    public function removeNamedRoute($name): void {
         $route = $this->getNamedRoute($name);
 
         // no exception, route exists, now remove by id
@@ -295,8 +289,7 @@ class Router implements RouterInterface
      *
      * @return string A group pattern to prefix routes with
      */
-    protected function processGroups()
-    {
+    protected function processGroups(): string {
         $pattern = "";
         foreach ($this->routeGroups as $group) {
             $pattern .= $group->getPattern();
@@ -413,8 +406,7 @@ class Router implements RouterInterface
      * @throws RuntimeException         If named route does not exist
      * @throws InvalidArgumentException If required data not provided
      */
-    public function urlFor($name, array $data = [], array $queryParams = [])
-    {
+    public function urlFor($name, array $data = [], array $queryParams = []): string {
         $url = $this->relativePathFor($name, $data, $queryParams);
 
         if ($this->basePath) {
@@ -437,8 +429,7 @@ class Router implements RouterInterface
      * @throws RuntimeException         If named route does not exist
      * @throws InvalidArgumentException If required data not provided
      */
-    public function fullUrlFor(UriInterface $uri, $routeName, array $data = [], array $queryParams = [])
-    {
+    public function fullUrlFor(UriInterface $uri, $routeName, array $data = [], array $queryParams = []): string {
         $path = $this->urlFor($routeName, $data, $queryParams);
         $scheme = $uri->getScheme();
         $authority = $uri->getAuthority();

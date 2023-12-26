@@ -21,8 +21,7 @@ use UnexpectedValueException;
 
 class ErrorTest extends TestCase
 {
-    public function errorProvider()
-    {
+    public static static function errorProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
@@ -38,8 +37,7 @@ class ErrorTest extends TestCase
      *
      * @dataProvider errorProvider
      */
-    public function testError($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testError($acceptHeader, $contentType, $startOfBody): void {
         $error = new Error();
         $e = new Exception("Oops", 1, new Exception('Previous oops'));
 
@@ -56,8 +54,7 @@ class ErrorTest extends TestCase
      *
      * @dataProvider errorProvider
      */
-    public function testErrorDisplayDetails($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testErrorDisplayDetails($acceptHeader, $contentType, $startOfBody): void {
         $error = new Error(true);
         $e = new Exception('Oops', 1, new Exception('Opps before'));
 
@@ -69,15 +66,14 @@ class ErrorTest extends TestCase
         $this->assertEquals(0, strpos((string)$res->getBody(), $startOfBody));
     }
 
-    public function testNotFoundContentType()
-    {
+    public function testNotFoundContentType(): void {
         $errorMock = $this->getMockBuilder(Error::class)->setMethods(['determineContentType'])->getMock();
         $errorMock->method('determineContentType')
             ->will($this->returnValue('unknown/type'));
 
         $e = new Exception("Oops");
 
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $this->expectException(UnexpectedValueException::class);
         $errorMock->__invoke($req, new Response(), $e);
     }
@@ -86,9 +82,8 @@ class ErrorTest extends TestCase
      * Test that an exception with a previous exception provides correct output
      * to the error log
      */
-    public function testPreviousException()
-    {
-        $error = $this->getMockBuilder('\Slim\Handlers\Error')->setMethods(['logError'])->getMock();
+    public function testPreviousException(): void {
+        $error = $this->getMockBuilder(Error::class)->setMethods(['logError'])->getMock();
         $error->expects($this->once())->method('logError')->with(
             $this->logicalAnd(
                 $this->stringContains("Type: Exception" . PHP_EOL . "Message: Second Oops"),
@@ -106,8 +101,7 @@ class ErrorTest extends TestCase
      * If someone extends the Error handler and calls renderHtmlExceptionOrError with
      * a parameter that isn't an Exception or Error, then we thrown an Exception.
      */
-    public function testRenderHtmlExceptionOrErrorTypeChecksParameter()
-    {
+    public function testRenderHtmlExceptionOrErrorTypeChecksParameter(): void {
         $class = new ReflectionClass(Error::class);
         $renderHtmlExceptionorError = $class->getMethod('renderHtmlExceptionOrError');
         $renderHtmlExceptionorError->setAccessible(true);

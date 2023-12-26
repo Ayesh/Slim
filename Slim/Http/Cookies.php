@@ -55,8 +55,7 @@ class Cookies implements CookiesInterface
      *
      * @param array $settings
      */
-    public function setDefaults(array $settings)
-    {
+    public function setDefaults(array $settings): void {
         $this->defaults = array_replace($this->defaults, $settings);
     }
 
@@ -65,7 +64,7 @@ class Cookies implements CookiesInterface
      */
     public function get($name, $default = null)
     {
-        return isset($this->requestCookies[$name]) ? $this->requestCookies[$name] : $default;
+        return $this->requestCookies[$name] ?? $default;
     }
 
     /**
@@ -100,8 +99,7 @@ class Cookies implements CookiesInterface
      *
      * @return string
      */
-    protected function toHeader($name, array $properties)
-    {
+    protected function toHeader($name, array $properties): string {
         $result = urlencode($name) . '=' . urlencode($properties['value']);
 
         if (isset($properties['domain'])) {
@@ -150,7 +148,7 @@ class Cookies implements CookiesInterface
     public static function parseHeader($header)
     {
         if (is_array($header) === true) {
-            $header = isset($header[0]) ? $header[0] : '';
+            $header = $header[0] ?? '';
         }
 
         if (is_string($header) === false) {

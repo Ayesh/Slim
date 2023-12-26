@@ -15,20 +15,19 @@ use RuntimeException;
 use Slim\Http\Body;
 use Slim\Http\Headers;
 use Slim\Http\Response;
+use Psr\Http\Message\StreamInterface;
 
 class ResponseTest extends TestCase
 {
-    public function testConstructorWithDefaultArgs()
-    {
+    public function testConstructorWithDefaultArgs(): void {
         $response = new Response();
 
         $this->assertAttributeEquals(200, 'status', $response);
-        $this->assertAttributeInstanceOf('\Slim\Http\Headers', 'headers', $response);
-        $this->assertAttributeInstanceOf('\Psr\Http\Message\StreamInterface', 'body', $response);
+        $this->assertAttributeInstanceOf(Headers::class, 'headers', $response);
+        $this->assertAttributeInstanceOf(StreamInterface::class, 'body', $response);
     }
 
-    public function testConstructorWithCustomArgs()
-    {
+    public function testConstructorWithCustomArgs(): void {
         $headers = new Headers();
         $body = new Body(fopen('php://temp', 'r+'));
         $response = new Response(404, $headers, $body);
@@ -38,8 +37,7 @@ class ResponseTest extends TestCase
         $this->assertAttributeSame($body, 'body', $response);
     }
 
-    public function testDeepCopyClone()
-    {
+    public function testDeepCopyClone(): void {
         $headers = new Headers();
         $body = new Body(fopen('php://temp', 'r+'));
         $response = new Response(404, $headers, $body);
@@ -51,16 +49,14 @@ class ResponseTest extends TestCase
         $this->assertAttributeSame($body, 'body', $clone);
     }
 
-    public function testDisableSetter()
-    {
+    public function testDisableSetter(): void {
         $response = new Response();
         $response->foo = 'bar';
 
         $this->assertFalse(property_exists($response, 'foo'));
     }
 
-    public function testGetStatusCode()
-    {
+    public function testGetStatusCode(): void {
         $response = new Response();
         $responseStatus = new ReflectionProperty($response, 'status');
         $responseStatus->setAccessible(true);
@@ -69,8 +65,7 @@ class ResponseTest extends TestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testWithStatus()
-    {
+    public function testWithStatus(): void {
         $response = new Response();
         $clone = $response->withStatus(302);
 
@@ -80,8 +75,7 @@ class ResponseTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testWithStatusInvalidStatusCodeThrowsException()
-    {
+    public function testWithStatusInvalidStatusCodeThrowsException(): void {
         $response = new Response();
         $response->withStatus(800);
     }
@@ -90,21 +84,18 @@ class ResponseTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage ReasonPhrase must be a string
      */
-    public function testWithStatusInvalidReasonPhraseThrowsException()
-    {
+    public function testWithStatusInvalidReasonPhraseThrowsException(): void {
         $response = new Response();
         $response->withStatus(200, null);
     }
 
-    public function testWithStatusEmptyReasonPhrase()
-    {
+    public function testWithStatusEmptyReasonPhrase(): void {
         $responseWithNoMessage = new Response(310);
 
         $this->assertEquals('', $responseWithNoMessage->getReasonPhrase());
     }
 
-    public function testGetReasonPhrase()
-    {
+    public function testGetReasonPhrase(): void {
         $response = new Response(404);
 
         $this->assertEquals('Not Found', $response->getReasonPhrase());
@@ -114,30 +105,26 @@ class ResponseTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage ReasonPhrase must be supplied for this code
      */
-    public function testMustSetReasonPhraseForUnrecognisedCode()
-    {
+    public function testMustSetReasonPhraseForUnrecognisedCode(): void {
         $response = new Response();
         $response = $response->withStatus(199);
     }
 
-    public function testSetReasonPhraseForUnrecognisedCode()
-    {
+    public function testSetReasonPhraseForUnrecognisedCode(): void {
         $response = new Response();
         $response = $response->withStatus(199, 'Random Message');
 
         $this->assertEquals('Random Message', $response->getReasonPhrase());
     }
 
-    public function testGetCustomReasonPhrase()
-    {
+    public function testGetCustomReasonPhrase(): void {
         $response = new Response();
         $clone = $response->withStatus(200, 'Custom Phrase');
 
         $this->assertEquals('Custom Phrase', $clone->getReasonPhrase());
     }
 
-    public function testWithRedirect()
-    {
+    public function testWithRedirect(): void {
         $response = new Response(200);
         $clone = $response->withRedirect('/foo', 301);
         $cloneWithDefaultStatus = $response->withRedirect('/foo');
@@ -159,8 +146,7 @@ class ResponseTest extends TestCase
         $this->assertEquals('/foo', $cloneWithStatusMethod->getHeaderLine('Location'));
     }
 
-    public function testIsEmpty()
-    {
+    public function testIsEmpty(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -169,8 +155,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isEmpty());
     }
 
-    public function testIsInformational()
-    {
+    public function testIsInformational(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -179,8 +164,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isInformational());
     }
 
-    public function testIsOk()
-    {
+    public function testIsOk(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -189,8 +173,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isOk());
     }
 
-    public function testIsSuccessful()
-    {
+    public function testIsSuccessful(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -199,8 +182,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isSuccessful());
     }
 
-    public function testIsRedirect()
-    {
+    public function testIsRedirect(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -209,8 +191,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isRedirect());
     }
 
-    public function testIsRedirection()
-    {
+    public function testIsRedirection(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -219,8 +200,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isRedirection());
     }
 
-    public function testIsForbidden()
-    {
+    public function testIsForbidden(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -229,8 +209,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isForbidden());
     }
 
-    public function testIsNotFound()
-    {
+    public function testIsNotFound(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -239,8 +218,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isNotFound());
     }
 
-    public function testIsBadRequest()
-    {
+    public function testIsBadRequest(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -249,8 +227,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isBadRequest());
     }
 
-    public function testIsClientError()
-    {
+    public function testIsClientError(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -259,8 +236,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isClientError());
     }
 
-    public function testIsServerError()
-    {
+    public function testIsServerError(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
         $prop->setAccessible(true);
@@ -269,8 +245,7 @@ class ResponseTest extends TestCase
         $this->assertTrue($response->isServerError());
     }
 
-    public function testToString()
-    {
+    public function testToString(): void {
         $output = 'HTTP/1.1 404 Not Found' . Response::EOL .
                   'X-Foo: Bar' . Response::EOL . Response::EOL .
                   'Where am I?';
@@ -281,8 +256,7 @@ class ResponseTest extends TestCase
         echo $response;
     }
 
-    public function testWithJson()
-    {
+    public function testWithJson(): void {
         $data = ['foo' => 'bar1&bar2'];
 
         $originalResponse = new Response();
@@ -323,8 +297,7 @@ class ResponseTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testWithInvalidJsonThrowsException()
-    {
+    public function testWithInvalidJsonThrowsException(): void {
         $data = ['foo' => 'bar'.chr(233)];
         $this->assertEquals('bar'.chr(233), $data['foo']);
 
@@ -336,16 +309,14 @@ class ResponseTest extends TestCase
         $this->assertFalse(true);
     }
 
-    public function testStatusIsSetTo302IfLocationIsSetWhenStatusis200()
-    {
+    public function testStatusIsSetTo302IfLocationIsSetWhenStatusis200(): void {
         $response = new Response();
         $response = $response->withHeader('Location', '/foo');
 
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    public function testStatusIsNotSetTo302IfLocationIsSetWhenStatusisNot200()
-    {
+    public function testStatusIsNotSetTo302IfLocationIsSetWhenStatusisNot200(): void {
         $response = new Response();
         $response = $response->withStatus(201)->withHeader('Location', '/foo');
 

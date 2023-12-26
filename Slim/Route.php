@@ -87,8 +87,7 @@ class Route extends Routable implements RouteInterface
         $this->identifier = 'route' . $identifier;
     }
 
-    public function finalize()
-    {
+    public function finalize(): void {
         if ($this->finalized) {
             return;
         }
@@ -112,8 +111,7 @@ class Route extends Routable implements RouteInterface
      *
      * @return callable
      */
-    public function getCallable()
-    {
+    public function getCallable(): callable {
         return $this->callable;
     }
 
@@ -122,8 +120,7 @@ class Route extends Routable implements RouteInterface
      *
      * @param string|Closure $callable
      */
-    public function setCallable($callable)
-    {
+    public function setCallable($callable): void {
         $this->callable = $callable;
     }
 
@@ -132,8 +129,7 @@ class Route extends Routable implements RouteInterface
      *
      * @return string[]
      */
-    public function getMethods()
-    {
+    public function getMethods(): array {
         return $this->methods;
     }
 
@@ -142,8 +138,7 @@ class Route extends Routable implements RouteInterface
      *
      * @return RouteGroup[]
      */
-    public function getGroups()
-    {
+    public function getGroups(): array {
         return $this->groups;
     }
 
@@ -160,8 +155,7 @@ class Route extends Routable implements RouteInterface
      *
      * @return string
      */
-    public function getIdentifier()
-    {
+    public function getIdentifier(): string {
         return $this->identifier;
     }
 

@@ -12,8 +12,8 @@ use Psr\Http\Message\StreamInterface;
 
 class SmallChunksStream implements StreamInterface
 {
-    const CHUNK_SIZE = 10;
-    const SIZE = 40;
+    const int CHUNK_SIZE = 10;
+    const int SIZE = 40;
 
     /**
      * @var int

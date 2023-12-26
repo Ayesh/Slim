@@ -17,7 +17,7 @@ use Slim\Interfaces\CallableResolverInterface;
  */
 final class CallableResolver implements CallableResolverInterface
 {
-    const CALLABLE_PATTERN = '!^([^\:]+)\:([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)$!';
+    const string CALLABLE_PATTERN = '!^([^\:]+)\:([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)$!';
 
     /**
      * @var ContainerInterface
@@ -54,7 +54,7 @@ final class CallableResolver implements CallableResolverInterface
         $resolved = $toResolve;
 
         if (is_string($toResolve)) {
-            list($class, $method) = $this->parseCallable($toResolve);
+            [$class, $method] = $this->parseCallable($toResolve);
             $resolved = $this->resolveCallable($class, $method);
         }
 
@@ -69,8 +69,7 @@ final class CallableResolver implements CallableResolverInterface
      *
      * @return array
      */
-    protected function parseCallable($toResolve)
-    {
+    protected function parseCallable($toResolve): array {
         if (preg_match(self::CALLABLE_PATTERN, $toResolve, $matches)) {
             return [$matches[1], $matches[2]];
         }
@@ -107,8 +106,7 @@ final class CallableResolver implements CallableResolverInterface
      *
      * @throws RuntimeException if the callable is not resolvable
      */
-    protected function assertCallable($callable)
-    {
+    protected function assertCallable($callable): void {
         if (!is_callable($callable)) {
             throw new RuntimeException(sprintf(
                 '%s is not resolvable',

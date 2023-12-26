@@ -16,8 +16,7 @@ use Slim\Http\Uri;
 
 class NotFoundTest extends TestCase
 {
-    public function notFoundProvider()
-    {
+    public static function notFoundProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
@@ -33,8 +32,7 @@ class NotFoundTest extends TestCase
      *
      * @dataProvider notFoundProvider
      */
-    public function testNotFound($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testNotFound($acceptHeader, $contentType, $startOfBody): void {
         $notAllowed = new NotFound();
 
         /** @var Response $res */
@@ -45,8 +43,7 @@ class NotFoundTest extends TestCase
         $this->assertEquals(0, strpos((string)$res->getBody(), $startOfBody));
     }
 
-    public function testNotFoundContentType()
-    {
+    public function testNotFoundContentType(): void {
         $errorMock = $this->getMockBuilder(NotFound::class)->setMethods(['determineContentType'])->getMock();
         $errorMock->method('determineContentType')
             ->willReturn('unknown/type');

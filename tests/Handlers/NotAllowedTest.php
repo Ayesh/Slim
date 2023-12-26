@@ -15,8 +15,7 @@ use Slim\Http\Response;
 
 class NotAllowedTest extends TestCase
 {
-    public function invalidMethodProvider()
-    {
+    public static function invalidMethodProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
@@ -32,8 +31,7 @@ class NotAllowedTest extends TestCase
      *
      * @dataProvider invalidMethodProvider
      */
-    public function testInvalidMethod($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testInvalidMethod($acceptHeader, $contentType, $startOfBody): void {
         $notAllowed = new NotAllowed();
 
         /** @var Response $res */
@@ -46,8 +44,7 @@ class NotAllowedTest extends TestCase
         $this->assertEquals(0, strpos((string)$res->getBody(), $startOfBody));
     }
 
-    public function testOptions()
-    {
+    public function testOptions(): void {
         $notAllowed = new NotAllowed();
 
         /** @var Response $res */
@@ -58,8 +55,7 @@ class NotAllowedTest extends TestCase
         $this->assertEquals('POST, PUT', $res->getHeaderLine('Allow'));
     }
 
-    public function testNotFoundContentType()
-    {
+    public function testNotFoundContentType(): void {
         $errorMock = $this->getMockBuilder(NotAllowed::class)->setMethods(['determineContentType'])->getMock();
         $errorMock->method('determineContentType')
             ->willReturn('unknown/type');
@@ -75,7 +71,7 @@ class NotAllowedTest extends TestCase
      */
     protected function getRequest($method, $contentType = 'text/html')
     {
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $req->expects($this->once())->method('getMethod')->will($this->returnValue($method));
         $req->expects($this->any())->method('getHeaderLine')->will($this->returnValue($contentType));
 

@@ -23,7 +23,7 @@ class Stream implements StreamInterface
      *
      * This is octal as per header stat.h
      */
-    const FSTAT_MODE_S_IFIFO = 0010000;
+    const int FSTAT_MODE_S_IFIFO = 0010000;
 
     /**
      * Resource modes
@@ -115,7 +115,7 @@ class Stream implements StreamInterface
             return $this->meta;
         }
 
-        return isset($this->meta[$key]) ? $this->meta[$key] : null;
+        return $this->meta[$key] ?? null;
     }
 
     /**
@@ -125,8 +125,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    protected function isAttached()
-    {
+    protected function isAttached(): bool {
         return is_resource($this->stream);
     }
 
@@ -139,8 +138,7 @@ class Stream implements StreamInterface
      *
      * @throws InvalidArgumentException If argument is not a valid PHP resource.
      */
-    protected function attach($newStream)
-    {
+    protected function attach($newStream): void {
         if (is_resource($newStream) === false) {
             throw new InvalidArgumentException(__METHOD__ . ' argument must be a valid PHP resource');
         }
@@ -430,8 +428,7 @@ class Stream implements StreamInterface
      *
      * @return bool
      */
-    public function isPipe()
-    {
+    public function isPipe(): bool {
         if ($this->isPipe === null) {
             $this->isPipe = false;
             if ($this->isAttached()) {

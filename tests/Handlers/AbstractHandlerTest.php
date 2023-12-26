@@ -10,12 +10,12 @@ namespace Slim\Tests\Handlers;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Slim\Handlers\AbstractHandler;
+use Slim\Http\Request;
 
 class AbstractHandlerTest extends TestCase
 {
-    public function testHalfValidContentType()
-    {
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+    public function testHalfValidContentType(): void {
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
 
         $req->expects($this->any())->method('getHeaderLine')->will($this->returnValue('unknown/+json'));
 
@@ -45,9 +45,8 @@ class AbstractHandlerTest extends TestCase
      * Ensure that an acceptable media-type is found in the Accept header even
      * if it's not the first in the list.
      */
-    public function testAcceptableMediaTypeIsNotFirstInList()
-    {
-        $request = $this->getMockBuilder('Slim\Http\Request')
+    public function testAcceptableMediaTypeIsNotFirstInList(): void {
+        $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->getMock();
 

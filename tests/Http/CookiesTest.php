@@ -17,8 +17,7 @@ use stdClass;
 
 class CookiesTest extends TestCase
 {
-    public function testConstructor()
-    {
+    public function testConstructor(): void {
         $cookies = new Cookies([
             'test' => 'Works',
         ]);
@@ -28,8 +27,7 @@ class CookiesTest extends TestCase
         $this->assertEquals('Works', $prop->getValue($cookies)['test']);
     }
 
-    public function testSetDefaults()
-    {
+    public function testSetDefaults(): void {
         $defaults = [
             'value' => 'toast',
             'domain' => null,
@@ -54,8 +52,7 @@ class CookiesTest extends TestCase
         $this->assertNotEquals($origDefaults, $prop->getValue($cookies));
     }
 
-    public function testSetCookieValues()
-    {
+    public function testSetCookieValues(): void {
         $cookies = new Cookies;
         $cookies->set('foo', 'bar');
 
@@ -79,8 +76,7 @@ class CookiesTest extends TestCase
         $this->assertEquals($expectedValue, $prop->getValue($cookies));
     }
 
-    public function testSetCookieValuesContainDefaults()
-    {
+    public function testSetCookieValuesContainDefaults(): void {
         $cookies = new Cookies;
         $defaults = [
             'value' => 'toast',
@@ -116,8 +112,7 @@ class CookiesTest extends TestCase
         $this->assertEquals($expectedValue, $prop->getValue($cookies));
     }
 
-    public function testSetCookieValuesCanOverrideDefaults()
-    {
+    public function testSetCookieValuesCanOverrideDefaults(): void {
         $cookies = new Cookies;
         $defaults = [
             'value' => 'toast',
@@ -155,8 +150,7 @@ class CookiesTest extends TestCase
     }
 
 
-    public function testSetSameSiteCookieValuesAreCaseInsensitive()
-    {
+    public function testSetSameSiteCookieValuesAreCaseInsensitive(): void {
         // See also:
         // https://tools.ietf.org/html/draft-west-first-party-cookies-07#section-4.1
 
@@ -189,30 +183,26 @@ class CookiesTest extends TestCase
         $this->assertEquals($expectedValue, $prop->getValue($cookies));
     }
 
-    public function testGet()
-    {
+    public function testGet(): void {
         $cookies = new Cookies(['foo' => 'bar']);
         $this->assertEquals('bar', $cookies->get('foo'));
         $this->assertNull($cookies->get('missing'));
         $this->assertEquals('defaultValue', $cookies->get('missing', 'defaultValue'));
     }
 
-    public function testParseHeader()
-    {
+    public function testParseHeader(): void {
         $cookies = Cookies::parseHeader('foo=bar; name=Josh');
         $this->assertEquals('bar', $cookies['foo']);
         $this->assertEquals('Josh', $cookies['name']);
     }
 
-    public function testParseHeaderWithJsonArray()
-    {
+    public function testParseHeaderWithJsonArray(): void {
         $cookies = Cookies::parseHeader('foo=bar; testarray=["someVar1","someVar2","someVar3"]');
         $this->assertEquals('bar', $cookies['foo']);
         $this->assertContains('someVar3', json_decode($cookies['testarray']));
     }
 
-    public function testToHeaders()
-    {
+    public function testToHeaders(): void {
         $cookies = new Cookies;
         $cookies->set('test', 'Works');
         $cookies->set('test_array', ['value' => 'bar', 'domain' => 'example.com']);
@@ -220,8 +210,7 @@ class CookiesTest extends TestCase
         $this->assertEquals('test_array=bar; domain=example.com', $cookies->toHeaders()[1]);
     }
 
-    public function testToHeader()
-    {
+    public function testToHeader(): void {
         $cookies = new Cookies();
         $class = new ReflectionClass($cookies);
         $method = $class->getMethod('toHeader');
@@ -268,8 +257,7 @@ class CookiesTest extends TestCase
         $this->assertEquals('test_date=Works; expires=' . $formattedStringDate, $cookieStringDate);
     }
 
-    public function testParseHeaderException()
-    {
+    public function testParseHeaderException(): void {
         $this->setExpectedException(InvalidArgumentException::class);
         Cookies::parseHeader(new stdClass);
     }

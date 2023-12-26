@@ -12,8 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class MiddlewareStub
 {
-    public function run(RequestInterface $request, ResponseInterface $response, $next)
-    {
+    public function run(RequestInterface $request, ResponseInterface $response, $next): ResponseInterface {
         return $response;
     }
 }

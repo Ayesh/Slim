@@ -31,8 +31,7 @@ class StreamTest extends TestCase
         }
     }
 
-    public function testIsPipe()
-    {
+    public function testIsPipe(): void {
         $this->openPipeStream();
 
         $this->assertTrue($this->pipeStream->isPipe());
@@ -45,15 +44,13 @@ class StreamTest extends TestCase
         $this->assertFalse($fileStream->isPipe());
     }
 
-    public function testIsPipeReadable()
-    {
+    public function testIsPipeReadable(): void {
         $this->openPipeStream();
 
         $this->assertTrue($this->pipeStream->isReadable());
     }
 
-    public function testPipeIsNotSeekable()
-    {
+    public function testPipeIsNotSeekable(): void {
         $this->openPipeStream();
 
         $this->assertFalse($this->pipeStream->isSeekable());
@@ -62,8 +59,7 @@ class StreamTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testCannotSeekPipe()
-    {
+    public function testCannotSeekPipe(): void {
         $this->openPipeStream();
 
         $this->pipeStream->seek(0);
@@ -72,8 +68,7 @@ class StreamTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testCannotTellPipe()
-    {
+    public function testCannotTellPipe(): void {
         $this->openPipeStream();
 
         $this->pipeStream->tell();
@@ -82,22 +77,19 @@ class StreamTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testCannotRewindPipe()
-    {
+    public function testCannotRewindPipe(): void {
         $this->openPipeStream();
 
         $this->pipeStream->rewind();
     }
 
-    public function testPipeGetSizeYieldsNull()
-    {
+    public function testPipeGetSizeYieldsNull(): void {
         $this->openPipeStream();
 
         $this->assertNull($this->pipeStream->getSize());
     }
 
-    public function testClosePipe()
-    {
+    public function testClosePipe(): void {
         $this->openPipeStream();
 
         stream_get_contents($this->pipeFh); // prevent broken pipe error message
@@ -107,15 +99,13 @@ class StreamTest extends TestCase
         $this->assertFalse($this->pipeStream->isPipe());
     }
 
-    public function testPipeToString()
-    {
+    public function testPipeToString(): void {
         $this->openPipeStream();
 
         $this->assertSame('', (string) $this->pipeStream);
     }
 
-    public function testPipeGetContents()
-    {
+    public function testPipeGetContents(): void {
         $this->openPipeStream();
 
         $contents = trim($this->pipeStream->getContents());
@@ -127,8 +117,7 @@ class StreamTest extends TestCase
      *
      * @see StreamTest::pipeStream
      */
-    private function openPipeStream()
-    {
+    private function openPipeStream(): void {
         $this->pipeFh = popen('echo 12', 'r');
         $this->pipeStream = new Stream($this->pipeFh);
     }

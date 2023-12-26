@@ -283,8 +283,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string
      */
-    public function getOriginalMethod()
-    {
+    public function getOriginalMethod(): ?string {
         return $this->originalMethod;
     }
 
@@ -324,8 +323,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @throws InvalidArgumentException on invalid HTTP method.
      */
-    protected function filterMethod($method)
-    {
+    protected function filterMethod($method): ?string {
         if ($method === null) {
             return $method;
         }
@@ -354,8 +352,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isMethod($method)
-    {
+    public function isMethod($method): bool {
         return $this->getMethod() === $method;
     }
 
@@ -366,8 +363,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isGet()
-    {
+    public function isGet(): bool {
         return $this->isMethod('GET');
     }
 
@@ -378,8 +374,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isPost()
-    {
+    public function isPost(): bool {
         return $this->isMethod('POST');
     }
 
@@ -390,8 +385,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isPut()
-    {
+    public function isPut(): bool {
         return $this->isMethod('PUT');
     }
 
@@ -402,8 +396,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isPatch()
-    {
+    public function isPatch(): bool {
         return $this->isMethod('PATCH');
     }
 
@@ -414,8 +407,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isDelete()
-    {
+    public function isDelete(): bool {
         return $this->isMethod('DELETE');
     }
 
@@ -426,8 +418,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isHead()
-    {
+    public function isHead(): bool {
         return $this->isMethod('HEAD');
     }
 
@@ -438,8 +429,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isOptions()
-    {
+    public function isOptions(): bool {
         return $this->isMethod('OPTIONS');
     }
 
@@ -450,8 +440,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isXhr()
-    {
+    public function isXhr(): bool {
         return $this->getHeaderLine('X-Requested-With') === 'XMLHttpRequest';
     }
 
@@ -603,8 +592,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string|null
      */
-    public function getContentType()
-    {
+    public function getContentType(): ?string {
         $result = $this->getHeader('Content-Type');
 
         return $result ? $result[0] : null;
@@ -636,8 +624,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string[]
      */
-    public function getMediaTypeParams()
-    {
+    public function getMediaTypeParams(): array {
         $contentType = $this->getContentType();
         $contentTypeParams = [];
         if ($contentType) {
@@ -659,8 +646,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string|null
      */
-    public function getContentCharset()
-    {
+    public function getContentCharset(): ?string {
         $mediaTypeParams = $this->getMediaTypeParams();
         if (isset($mediaTypeParams['charset'])) {
             return $mediaTypeParams['charset'];
@@ -676,8 +662,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return int|null
      */
-    public function getContentLength()
-    {
+    public function getContentLength(): ?int {
         $result = $this->headers->get('Content-Length');
 
         return $result ? (int)$result[0] : null;
@@ -1082,8 +1067,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return $this
      */
-    public function reparseBody()
-    {
+    public function reparseBody(): self {
         $this->bodyParsed = false;
 
         return $this;
@@ -1097,8 +1081,7 @@ class Request extends Message implements ServerRequestInterface
      * @param string   $mediaType A HTTP media type (excluding content-type params).
      * @param callable $callable  A callable that returns parsed contents for media type.
      */
-    public function registerMediaTypeParser($mediaType, callable $callable)
-    {
+    public function registerMediaTypeParser($mediaType, callable $callable): void {
         if ($callable instanceof Closure) {
             $callable = $callable->bindTo($this);
         }
@@ -1184,8 +1167,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return mixed[]
      */
-    public function getParams(array $only = null)
-    {
+    public function getParams(array $only = null): array {
         $params = $this->getQueryParams();
         $postParams = $this->getParsedBody();
         if ($postParams) {

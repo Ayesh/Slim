@@ -64,8 +64,7 @@ class Error extends AbstractError
      *
      * @return string
      */
-    protected function renderHtmlErrorMessage(Exception $exception)
-    {
+    protected function renderHtmlErrorMessage(Exception $exception): string {
         $title = 'Slim Application Error';
 
         if ($this->displayErrorDetails) {
@@ -103,8 +102,7 @@ class Error extends AbstractError
      *
      * @return string
      */
-    protected function renderHtmlException(Exception $exception)
-    {
+    protected function renderHtmlException(Exception $exception): string {
         return $this->renderHtmlExceptionOrError($exception);
     }
 
@@ -117,8 +115,7 @@ class Error extends AbstractError
      *
      * @throws RuntimeException
      */
-    protected function renderHtmlExceptionOrError($exception)
-    {
+    protected function renderHtmlExceptionOrError($exception): string {
         if (!$exception instanceof Exception && !$exception instanceof \Error) {
             throw new RuntimeException("Unexpected type. Expected Exception or Error.");
         }
@@ -156,8 +153,7 @@ class Error extends AbstractError
      *
      * @return string
      */
-    protected function renderJsonErrorMessage(Exception $exception)
-    {
+    protected function renderJsonErrorMessage(Exception $exception): string {
         $error = [
             'message' => 'Slim Application Error',
         ];
@@ -187,8 +183,7 @@ class Error extends AbstractError
      *
      * @return string
      */
-    protected function renderXmlErrorMessage(Exception $exception)
-    {
+    protected function renderXmlErrorMessage(Exception $exception): string {
         $xml = "<error>\n  <message>Slim Application Error</message>\n";
         if ($this->displayErrorDetails) {
             do {
@@ -214,8 +209,7 @@ class Error extends AbstractError
      *
      * @return string
      */
-    private function createCdataSection($content)
-    {
+    private function createCdataSection($content): string {
         return sprintf('<![CDATA[%s]]>', str_replace(']]>', ']]]]><![CDATA[>', $content));
     }
 }

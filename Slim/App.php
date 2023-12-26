@@ -41,7 +41,7 @@ class App
      *
      * @var string
      */
-    const VERSION = '3.12.3';
+    const string VERSION = '3.12.3';
 
     /**
      * @var ContainerInterface
@@ -71,8 +71,7 @@ class App
      *
      * @return ContainerInterface
      */
-    public function getContainer()
-    {
+    public function getContainer(): ContainerInterface {
         return $this->container;
     }
 
@@ -121,8 +120,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function get($pattern, $callable)
-    {
+    public function get($pattern, $callable): RouteInterface {
         return $this->map(['GET'], $pattern, $callable);
     }
 
@@ -134,8 +132,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function post($pattern, $callable)
-    {
+    public function post($pattern, $callable): RouteInterface {
         return $this->map(['POST'], $pattern, $callable);
     }
 
@@ -147,8 +144,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function put($pattern, $callable)
-    {
+    public function put($pattern, $callable): RouteInterface {
         return $this->map(['PUT'], $pattern, $callable);
     }
 
@@ -160,8 +156,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function patch($pattern, $callable)
-    {
+    public function patch($pattern, $callable): RouteInterface {
         return $this->map(['PATCH'], $pattern, $callable);
     }
 
@@ -173,8 +168,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function delete($pattern, $callable)
-    {
+    public function delete($pattern, $callable): RouteInterface {
         return $this->map(['DELETE'], $pattern, $callable);
     }
 
@@ -186,8 +180,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function options($pattern, $callable)
-    {
+    public function options($pattern, $callable): RouteInterface {
         return $this->map(['OPTIONS'], $pattern, $callable);
     }
 
@@ -199,8 +192,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function any($pattern, $callable)
-    {
+    public function any($pattern, $callable): RouteInterface {
         return $this->map(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], $pattern, $callable);
     }
 
@@ -213,8 +205,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function map(array $methods, $pattern, $callable)
-    {
+    public function map(array $methods, $pattern, $callable): RouteInterface {
         if ($callable instanceof Closure) {
             $callable = $callable->bindTo($this->container);
         }
@@ -240,8 +231,7 @@ class App
      *
      * @return RouteInterface
      */
-    public function redirect($from, $to, $status = 302)
-    {
+    public function redirect($from, $to, $status = 302): RouteInterface {
         $handler = function ($request, ResponseInterface $response) use ($to, $status) {
             return $response->withHeader('Location', (string)$to)->withStatus($status);
         };
@@ -288,8 +278,7 @@ class App
      * @throws Exception
      * @throws Throwable
      */
-    public function run(bool $silent = false)
-    {
+    public function run(bool $silent = false): ResponseInterface {
         $response = $this->container->get('response');
 
         try {
@@ -338,8 +327,7 @@ class App
      *
      * @throws ContainerException
      */
-    protected function processInvalidMethod(ServerRequestInterface $request, ResponseInterface $response)
-    {
+    protected function processInvalidMethod(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         $router = $this->container->get('router');
         if (is_callable([$request->getUri(), 'getBasePath']) && is_callable([$router, 'setBasePath'])) {
             $router->setBasePath($request->getUri()->getBasePath());
@@ -373,8 +361,7 @@ class App
      * @throws Exception
      * @throws Throwable
      */
-    public function process(ServerRequestInterface $request, ResponseInterface $response)
-    {
+    public function process(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         // Ensure basePath is set
         $router = $this->container->get('router');
         if (is_callable([$request->getUri(), 'getBasePath']) && is_callable([$router, 'setBasePath'])) {
@@ -404,8 +391,7 @@ class App
      *
      * @param ResponseInterface $response
      */
-    public function respond(ResponseInterface $response)
-    {
+    public function respond(ResponseInterface $response): void {
         // Send response
         if (!headers_sent()) {
             // Headers
@@ -548,7 +534,7 @@ class App
         array $cookies = [],
         $bodyContent = '',
         ResponseInterface $response = null
-    ) {
+    ): ResponseInterface {
         $env = $this->container->get('environment');
         $uri = Uri::createFromEnvironment($env)->withPath($path)->withQuery($query);
         $headers = new Headers($headers);
@@ -573,8 +559,7 @@ class App
      *
      * @return ServerRequestInterface
      */
-    protected function dispatchRouterAndPrepareRoute(ServerRequestInterface $request, RouterInterface $router)
-    {
+    protected function dispatchRouterAndPrepareRoute(ServerRequestInterface $request, RouterInterface $router): ServerRequestInterface {
         $routeInfo = $router->dispatch($request);
 
         if ($routeInfo[0] === Dispatcher::FOUND) {
@@ -604,8 +589,7 @@ class App
      *
      * @throws RuntimeException
      */
-    protected function finalize(ResponseInterface $response)
-    {
+    protected function finalize(ResponseInterface $response): ResponseInterface {
         // stop PHP sending a Content-Type automatically
         ini_set('default_mimetype', '');
 
@@ -645,8 +629,7 @@ class App
      *
      * @return bool
      */
-    protected function isEmptyResponse(ResponseInterface $response)
-    {
+    protected function isEmptyResponse(ResponseInterface $response): bool {
         if (method_exists($response, 'isEmpty')) {
             return $response->isEmpty();
         }
@@ -661,8 +644,7 @@ class App
      *
      * @return bool
      */
-    protected function isHeadRequest(RequestInterface $request)
-    {
+    protected function isHeadRequest(RequestInterface $request): bool {
         return strtoupper($request->getMethod()) === 'HEAD';
     }
 
@@ -678,8 +660,7 @@ class App
      *
      * @throws Exception If a handler is needed and not found
      */
-    protected function handleException(Exception $e, ServerRequestInterface $request, ResponseInterface $response)
-    {
+    protected function handleException(Exception $e, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         if ($e instanceof MethodNotAllowedException) {
             $handler = 'notAllowedHandler';
             $params = [$e->getRequest(), $e->getResponse(), $e->getAllowedMethods()];
@@ -717,8 +698,7 @@ class App
      *
      * @throws Throwable
      */
-    protected function handlePhpError(Throwable $e, ServerRequestInterface $request, ResponseInterface $response)
-    {
+    protected function handlePhpError(Throwable $e, ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         $handler = 'phpErrorHandler';
         $params = [$request, $response, $e];
 

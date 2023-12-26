@@ -60,39 +60,33 @@ class RequestBodyTest extends TestCase
         return $stream;
     }
 
-    public function testConstructorAttachesStream()
-    {
+    public function testConstructorAttachesStream(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
         $bodyStream->setAccessible(true);
 
         $this->assertInternalType('resource', $bodyStream->getValue($this->body));
     }
 
-    public function testConstructorSetsMetadata()
-    {
+    public function testConstructorSetsMetadata(): void {
         $bodyMetadata = new ReflectionProperty($this->body, 'meta');
         $bodyMetadata->setAccessible(true);
 
         $this->assertInternalType('array', $bodyMetadata->getValue($this->body));
     }
 
-    public function testGetMetadata()
-    {
+    public function testGetMetadata(): void {
         $this->assertInternalType('array', $this->body->getMetadata());
     }
 
-    public function testGetMetadataKey()
-    {
+    public function testGetMetadataKey(): void {
         $this->assertEquals('php://temp', $this->body->getMetadata('uri'));
     }
 
-    public function testGetMetadataKeyNotFound()
-    {
+    public function testGetMetadataKeyNotFound(): void {
         $this->assertNull($this->body->getMetadata('foo'));
     }
 
-    public function testDetach()
-    {
+    public function testDetach(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
         $bodyStream->setAccessible(true);
 
@@ -118,20 +112,17 @@ class RequestBodyTest extends TestCase
         $this->assertNull($bodySeekable->getValue($this->body));
     }
 
-    public function testToStringAttached()
-    {
+    public function testToStringAttached(): void {
         $this->assertEquals($this->text, (string)$this->body);
     }
 
-    public function testToStringAttachedRewindsFirst()
-    {
+    public function testToStringAttachedRewindsFirst(): void {
         $this->assertEquals($this->text, (string)$this->body);
         $this->assertEquals($this->text, (string)$this->body);
         $this->assertEquals($this->text, (string)$this->body);
     }
 
-    public function testToStringDetached()
-    {
+    public function testToStringDetached(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
         $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
@@ -139,8 +130,7 @@ class RequestBodyTest extends TestCase
         $this->assertEquals('', (string)$this->body);
     }
 
-    public function testClose()
-    {
+    public function testClose(): void {
         $this->body->close();
 
         $this->assertAttributeEquals(null, 'stream', $this->body);
@@ -152,13 +142,11 @@ class RequestBodyTest extends TestCase
         $this->body->tell();
     }
 
-    public function testGetSizeAttached()
-    {
+    public function testGetSizeAttached(): void {
         $this->assertEquals(mb_strlen($this->text), $this->body->getSize());
     }
 
-    public function testGetSizeDetached()
-    {
+    public function testGetSizeDetached(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
         $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
@@ -166,32 +154,28 @@ class RequestBodyTest extends TestCase
         $this->assertNull($this->body->getSize());
     }
 
-    public function testTellAttached()
-    {
+    public function testTellAttached(): void {
         $this->body->seek(10);
 
         $this->assertEquals(10, $this->body->tell());
     }
 
-    public function testTellDetachedThrowsRuntimeException()
-    {
+    public function testTellDetachedThrowsRuntimeException(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
         $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
 
-        $this->setExpectedException('\RuntimeException');
+        $this->setExpectedException(\RuntimeException::class);
         $this->body->tell();
     }
 
-    public function testEofAttachedFalse()
-    {
+    public function testEofAttachedFalse(): void {
         $this->body->seek(10);
 
         $this->assertFalse($this->body->eof());
     }
 
-    public function testEofAttachedTrue()
-    {
+    public function testEofAttachedTrue(): void {
         while ($this->body->eof() === false) {
             $this->body->read(1024);
         }
@@ -199,8 +183,7 @@ class RequestBodyTest extends TestCase
         $this->assertTrue($this->body->eof());
     }
 
-    public function testEofDetached()
-    {
+    public function testEofDetached(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
         $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
@@ -208,90 +191,77 @@ class RequestBodyTest extends TestCase
         $this->assertTrue($this->body->eof());
     }
 
-    public function testIsReadableAttachedTrue()
-    {
+    public function testIsReadableAttachedTrue(): void {
         $this->assertTrue($this->body->isReadable());
     }
 
-    public function testIsReadableDetached()
-    {
+    public function testIsReadableDetached(): void {
         $this->body->detach();
 
         $this->assertFalse($this->body->isReadable());
     }
 
-    public function testIsWritableAttachedTrue()
-    {
+    public function testIsWritableAttachedTrue(): void {
         $this->assertTrue($this->body->isWritable());
     }
 
-    public function testIsWritableDetached()
-    {
+    public function testIsWritableDetached(): void {
         $this->body->detach();
 
         $this->assertFalse($this->body->isWritable());
     }
 
-    public function isSeekableAttachedTrue()
-    {
+    public function isSeekableAttachedTrue(): void {
         $this->assertTrue($this->body->isSeekable());
     }
 
     // TODO: Is seekable is false when attached... how?
 
-    public function testIsSeekableDetached()
-    {
+    public function testIsSeekableDetached(): void {
         $this->body->detach();
 
         $this->assertFalse($this->body->isSeekable());
     }
 
-    public function testSeekAttached()
-    {
+    public function testSeekAttached(): void {
         $this->body->seek(10);
 
         $this->assertEquals(10, $this->body->tell());
     }
 
-    public function testSeekDetachedThrowsRuntimeException()
-    {
+    public function testSeekDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException('\RuntimeException');
+        $this->setExpectedException(\RuntimeException::class);
         $this->body->seek(10);
     }
 
-    public function testRewindAttached()
-    {
+    public function testRewindAttached(): void {
         $this->body->seek(10);
         $this->body->rewind();
 
         $this->assertEquals(0, $this->body->tell());
     }
 
-    public function testRewindDetachedThrowsRuntimeException()
-    {
+    public function testRewindDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException('\RuntimeException');
+        $this->setExpectedException(\RuntimeException::class);
         $this->body->rewind();
     }
 
-    public function testReadAttached()
-    {
+    public function testReadAttached(): void {
         $this->assertEquals(substr($this->text, 0, 10), $this->body->read(10));
     }
 
-    public function testReadDetachedThrowsRuntimeException()
-    {
+    public function testReadDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException('\RuntimeException');
+        $this->setExpectedException(\RuntimeException::class);
         $this->body->read(10);
     }
 
-    public function testWriteAttached()
-    {
+    public function testWriteAttached(): void {
         while ($this->body->eof() === false) {
             $this->body->read(1024);
         }
@@ -300,26 +270,23 @@ class RequestBodyTest extends TestCase
         $this->assertEquals($this->text . 'foo', (string)$this->body);
     }
 
-    public function testWriteDetachedThrowsRuntimeException()
-    {
+    public function testWriteDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException('\RuntimeException');
+        $this->setExpectedException(\RuntimeException::class);
         $this->body->write('foo');
     }
 
-    public function testGetContentsAttached()
-    {
+    public function testGetContentsAttached(): void {
         $this->body->seek(10);
 
         $this->assertEquals(substr($this->text, 10), $this->body->getContents());
     }
 
-    public function testGetContentsDetachedThrowsRuntimeException()
-    {
+    public function testGetContentsDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException('\RuntimeException');
+        $this->setExpectedException(\RuntimeException::class);
         $this->body->getContents();
     }
 }

@@ -29,8 +29,7 @@ class DefaultServicesProvider
      *
      * @param Container $container A DI container implementing ArrayAccess and psr/container.
      */
-    public function register($container)
-    {
+    public function register($container): void {
         if (!isset($container['environment'])) {
             /**
              * This service MUST return a shared instance of \Slim\Http\Environment.
@@ -80,10 +79,7 @@ class DefaultServicesProvider
              * @return RouterInterface
              */
             $container['router'] = function ($container) {
-                $routerCacheFile = false;
-                if (isset($container->get('settings')['routerCacheFile'])) {
-                    $routerCacheFile = $container->get('settings')['routerCacheFile'];
-                }
+                $routerCacheFile = $container->get('settings')['routerCacheFile'] ?? false;
 
                 $router = (new Router)->setCacheFile($routerCacheFile);
                 if (method_exists($router, 'setContainer')) {

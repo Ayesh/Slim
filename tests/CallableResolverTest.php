@@ -100,10 +100,9 @@ class CallableResolverTest extends TestCase
         $this->assertEquals(1, InvokableTest::$CalledCount);
     }
 
-    public function testResolutionToAnInvokableClass()
-    {
+    public function testResolutionToAnInvokableClass(): void {
         $resolver = new CallableResolver($this->container);
-        $callable = $resolver->resolve('Slim\Tests\Mocks\InvokableTest');
+        $callable = $resolver->resolve(InvokableTest::class);
         $callable();
         $this->assertEquals(1, InvokableTest::$CalledCount);
     }

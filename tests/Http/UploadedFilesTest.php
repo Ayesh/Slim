@@ -43,8 +43,7 @@ class UploadedFilesTest extends TestCase
     /**
      * @return UploadedFile
      */
-    protected function generateNewTmpFile()
-    {
+    protected function generateNewTmpFile(): UploadedFile {
         $filename = './php'.microtime();
 
         $fh = fopen($filename, "w");
@@ -62,8 +61,7 @@ class UploadedFilesTest extends TestCase
      *
      * @dataProvider providerCreateFromEnvironment
      */
-    public function testCreateFromEnvironmentFromFilesSuperglobal(array $input, array $expected)
-    {
+    public function testCreateFromEnvironmentFromFilesSuperglobal(array $input, array $expected): void {
         $_FILES = $input;
 
         $uploadedFile = UploadedFile::createFromEnvironment(Environment::mock());
@@ -75,8 +73,7 @@ class UploadedFilesTest extends TestCase
      *
      * @dataProvider providerCreateFromEnvironment
      */
-    public function testCreateFromEnvironmentFromUserData(array $input)
-    {
+    public function testCreateFromEnvironmentFromUserData(array $input): void {
         //If slim.files provided - it will return what was provided
         $userData['slim.files'] = $input;
 
@@ -84,8 +81,7 @@ class UploadedFilesTest extends TestCase
         $this->assertEquals($input, $uploadedFile);
     }
 
-    public function testCreateFromEnvironmentWithoutFile()
-    {
+    public function testCreateFromEnvironmentWithoutFile(): void {
         unset($_FILES);
 
         $uploadedFile = UploadedFile::createFromEnvironment(Environment::mock());
@@ -95,8 +91,7 @@ class UploadedFilesTest extends TestCase
     /**
      * @return UploadedFile
      */
-    public function testConstructor()
-    {
+    public function testConstructor(): UploadedFile {
         $attr = [
             'tmp_name' => self::$filename,
             'name'     => 'my-avatar.txt',
@@ -130,10 +125,9 @@ class UploadedFilesTest extends TestCase
      *
      * @return UploadedFile
      */
-    public function testGetStream(UploadedFile $uploadedFile)
-    {
+    public function testGetStream(UploadedFile $uploadedFile): UploadedFile {
         $stream = $uploadedFile->getStream();
-        $this->assertEquals(true, $uploadedFile->getStream() instanceof Stream);
+        $this->assertTrue($uploadedFile->getStream() instanceof Stream);
         $stream->close();
 
         return $uploadedFile;
@@ -144,11 +138,10 @@ class UploadedFilesTest extends TestCase
      *
      * @param UploadedFile $uploadedFile
      */
-    public function testMoveToNotWritable(UploadedFile $uploadedFile)
-    {
+    public function testMoveToNotWritable(UploadedFile $uploadedFile): void {
         $tempName = uniqid('file-');
         $path = 'some_random_dir' . DIRECTORY_SEPARATOR . $tempName;
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException(\InvalidArgumentException::class);
         $uploadedFile->moveTo($path);
     }
 
@@ -159,8 +152,7 @@ class UploadedFilesTest extends TestCase
      *
      * @return UploadedFile
      */
-    public function testMoveTo(UploadedFile $uploadedFile)
-    {
+    public function testMoveTo(UploadedFile $uploadedFile): UploadedFile {
         $tempName = uniqid('file-');
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tempName;
         $uploadedFile->moveTo($path);
@@ -179,8 +171,7 @@ class UploadedFilesTest extends TestCase
      *
      * @expectedException RuntimeException
      */
-    public function testMoveToCannotBeDoneTwice(UploadedFile $uploadedFile)
-    {
+    public function testMoveToCannotBeDoneTwice(UploadedFile $uploadedFile): void {
         $tempName = uniqid('file-');
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tempName;
         $uploadedFile->moveTo($path);
@@ -197,9 +188,8 @@ class UploadedFilesTest extends TestCase
      *
      * @param UploadedFile $uploadedFile
      */
-    public function testMoveToAgain(UploadedFile $uploadedFile)
-    {
-        $this->setExpectedException('\RuntimeException');
+    public function testMoveToAgain(UploadedFile $uploadedFile): void {
+        $this->setExpectedException(RuntimeException::class);
 
         $tempName = uniqid('file-');
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tempName;
@@ -213,15 +203,13 @@ class UploadedFilesTest extends TestCase
      *
      * @param UploadedFile $uploadedFile
      */
-    public function testMovedStream($uploadedFile)
-    {
-        $this->setExpectedException('\RuntimeException');
+    public function testMovedStream($uploadedFile): void {
+        $this->setExpectedException(RuntimeException::class);
 
         $uploadedFile->getStream();
     }
 
-    public function testMoveToStream()
-    {
+    public function testMoveToStream(): void {
         $uploadedFile = $this->generateNewTmpFile();
         $contents = file_get_contents($uploadedFile->file);
 
@@ -233,8 +221,7 @@ class UploadedFilesTest extends TestCase
         $this->assertFileNotExists($uploadedFile->file);
     }
 
-    public function providerCreateFromEnvironment()
-    {
+    public static static function providerCreateFromEnvironment(): array {
         return [
             // no nest: <input name="avatar" type="file">
             [
@@ -482,8 +469,7 @@ class UploadedFilesTest extends TestCase
      *
      * @return Request
      */
-    public function requestFactory(array $settings)
-    {
+    public function requestFactory(array $settings): Request {
         $env = Environment::mock($settings);
 
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');

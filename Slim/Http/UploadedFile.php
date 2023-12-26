@@ -87,8 +87,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return array|null
      */
-    public static function createFromEnvironment(Environment $env)
-    {
+    public static function createFromEnvironment(Environment $env): ?array {
         if (is_array($env['slim.files']) && $env->has('slim.files')) {
             return $env['slim.files'];
         } elseif (! empty($_FILES)) {
@@ -107,8 +106,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return array
      */
-    private static function parseUploadedFiles(array $uploadedFiles)
-    {
+    private static function parseUploadedFiles(array $uploadedFiles): array {
         $parsed = [];
         foreach ($uploadedFiles as $field => $uploadedFile) {
             if (!isset($uploadedFile['error'])) {
@@ -122,9 +120,9 @@ class UploadedFile implements UploadedFileInterface
             if (!is_array($uploadedFile['error'])) {
                 $parsed[$field] = new static(
                     $uploadedFile['tmp_name'],
-                    isset($uploadedFile['name']) ? $uploadedFile['name'] : null,
-                    isset($uploadedFile['type']) ? $uploadedFile['type'] : null,
-                    isset($uploadedFile['size']) ? $uploadedFile['size'] : null,
+                    $uploadedFile['name'] ?? null,
+                    $uploadedFile['type'] ?? null,
+                    $uploadedFile['size'] ?? null,
                     $uploadedFile['error'],
                     true
                 );

@@ -18,8 +18,7 @@ class CallableTest
         static::$CalledContainer = $container;
     }
 
-    public function toCall()
-    {
+    public function toCall(): int {
         return static::$CalledCount++;
     }
 }

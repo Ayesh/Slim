@@ -56,8 +56,7 @@ abstract class Routable
      *
      * @return callable[]
      */
-    public function getMiddleware()
-    {
+    public function getMiddleware(): array {
         return $this->middleware;
     }
 
@@ -66,8 +65,7 @@ abstract class Routable
      *
      * @return string
      */
-    public function getPattern()
-    {
+    public function getPattern(): string {
         return $this->pattern;
     }
 
@@ -102,8 +100,7 @@ abstract class Routable
      *
      * @param string $newPattern
      */
-    public function setPattern($newPattern)
-    {
+    public function setPattern($newPattern): void {
         $this->pattern = $newPattern;
     }
 }

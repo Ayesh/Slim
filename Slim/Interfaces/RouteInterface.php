@@ -42,7 +42,7 @@ interface RouteInterface
      *
      * @return string
      */
-    public function getPattern();
+    public function getPattern(): string;
 
     /**
      * Set a route argument
@@ -94,7 +94,7 @@ interface RouteInterface
      *
      * @return RouteInterface
      */
-    public function add($callable);
+    public function add($callable): RouteInterface;
 
     /**
      * Prepare the route for use

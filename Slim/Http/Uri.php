@@ -132,21 +132,20 @@ class Uri implements UriInterface
      *
      * @return self
      */
-    public static function createFromString($uri)
-    {
+    public static function createFromString($uri): self {
         if (!is_string($uri) && !method_exists($uri, '__toString')) {
             throw new InvalidArgumentException('Uri must be a string');
         }
 
         $parts = parse_url($uri);
-        $scheme = isset($parts['scheme']) ? $parts['scheme'] : '';
-        $user = isset($parts['user']) ? $parts['user'] : '';
-        $pass = isset($parts['pass']) ? $parts['pass'] : '';
-        $host = isset($parts['host']) ? $parts['host'] : '';
-        $port = isset($parts['port']) ? $parts['port'] : null;
-        $path = isset($parts['path']) ? $parts['path'] : '';
-        $query = isset($parts['query']) ? $parts['query'] : '';
-        $fragment = isset($parts['fragment']) ? $parts['fragment'] : '';
+        $scheme = $parts['scheme'] ?? '';
+        $user = $parts['user'] ?? '';
+        $pass = $parts['pass'] ?? '';
+        $host = $parts['host'] ?? '';
+        $port = $parts['port'] ?? null;
+        $path = $parts['path'] ?? '';
+        $query = $parts['query'] ?? '';
+        $fragment = $parts['fragment'] ?? '';
 
         return new static($scheme, $host, $port, $path, $query, $fragment, $user, $pass);
     }
@@ -158,8 +157,7 @@ class Uri implements UriInterface
      *
      * @return self
      */
-    public static function createFromEnvironment(Environment $env)
-    {
+    public static function createFromEnvironment(Environment $env): self {
         // Scheme
         $isSecure = $env->get('HTTPS');
         $scheme = (empty($isSecure) || $isSecure === 'off') ? 'http' : 'https';
@@ -286,8 +284,7 @@ class Uri implements UriInterface
      * @throws InvalidArgumentException If the Uri scheme is not a string.
      * @throws InvalidArgumentException If Uri scheme is not "", "https", or "http".
      */
-    protected function filterScheme($scheme)
-    {
+    protected function filterScheme($scheme): string {
         static $valid = [
             '' => true,
             'https' => true,
@@ -389,8 +386,7 @@ class Uri implements UriInterface
      *
      * @return string The percent-encoded query string.
      */
-    protected function filterUserInfo($query)
-    {
+    protected function filterUserInfo($query): string {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=]+|%(?![A-Fa-f0-9]{2}))/u',
             function ($match) {
@@ -488,8 +484,7 @@ class Uri implements UriInterface
      *
      * @return bool
      */
-    protected function hasStandardPort()
-    {
+    protected function hasStandardPort(): bool {
         return ($this->scheme === 'http' && $this->port === 80) || ($this->scheme === 'https' && $this->port === 443);
     }
 
@@ -501,9 +496,8 @@ class Uri implements UriInterface
      *
      * @throws InvalidArgumentException If the port is invalid.
      */
-    protected function filterPort($port)
-    {
-        if (is_null($port) || (is_integer($port) && ($port >= 1 && $port <= 65535))) {
+    protected function filterPort($port): ?int {
+        if (is_null($port) || (is_int($port) && ($port >= 1 && $port <= 65535))) {
             return $port;
         }
 
@@ -591,8 +585,7 @@ class Uri implements UriInterface
      *
      * @return string The base path segment of the URI.
      */
-    public function getBasePath()
-    {
+    public function getBasePath(): string {
         return $this->basePath;
     }
 
@@ -638,8 +631,7 @@ class Uri implements UriInterface
      *
      * @link   http://www.faqs.org/rfcs/rfc3986.html
      */
-    protected function filterPath($path)
-    {
+    protected function filterPath($path): string {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~:@&=\+\$,\/;%]+|%(?![A-Fa-f0-9]{2}))/',
             function ($match) {
@@ -711,8 +703,7 @@ class Uri implements UriInterface
      *
      * @return string The percent-encoded query string.
      */
-    protected function filterQuery(string $query)
-    {
+    protected function filterQuery(string $query): string {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/\?]+|%(?![A-Fa-f0-9]{2}))/',
             function ($match) {
@@ -822,8 +813,7 @@ class Uri implements UriInterface
      *
      * @return string
      */
-    public function getBaseUrl()
-    {
+    public function getBaseUrl(): string {
         $scheme = $this->getScheme();
         $authority = $this->getAuthority();
         $basePath = $this->getBasePath();

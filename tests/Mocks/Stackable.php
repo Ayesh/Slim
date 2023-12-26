@@ -20,18 +20,15 @@ class Stackable
         return $response->write('Center');
     }
 
-    public function alternativeSeed()
-    {
+    public function alternativeSeed(): void {
         $this->seedMiddlewareStack([$this, 'testMiddlewareKernel']);
     }
 
-    public function testMiddlewareKernel(ServerRequestInterface $request, Response $response)
-    {
+    public function testMiddlewareKernel(ServerRequestInterface $request, Response $response): Response {
         return $response->write('hello from testMiddlewareKernel');
     }
 
-    public function add($callable)
-    {
+    public function add($callable): Stackable {
         $this->addMiddleware($callable);
         return $this;
     }

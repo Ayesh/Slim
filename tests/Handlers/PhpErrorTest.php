@@ -18,8 +18,7 @@ use UnexpectedValueException;
 
 class PhpErrorTest extends TestCase
 {
-    public function phpErrorProvider()
-    {
+    public static static static static function phpErrorProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
@@ -36,8 +35,7 @@ class PhpErrorTest extends TestCase
      * @requires PHP 7.0
      * @dataProvider phpErrorProvider
      */
-    public function testPhpError($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testPhpError($acceptHeader, $contentType, $startOfBody): void {
         $error = new PhpError();
 
         /** @var Response $res */
@@ -52,8 +50,7 @@ class PhpErrorTest extends TestCase
      * Test invalid method returns the correct code and content type
      * @dataProvider phpErrorProvider
      */
-    public function testPhpErrorDisplayDetails($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testPhpErrorDisplayDetails($acceptHeader, $contentType, $startOfBody): void {
         $error = new PhpError(true);
 
         $exception = new Exception('Oops', 1, new Exception('Opps before'));
@@ -69,8 +66,7 @@ class PhpErrorTest extends TestCase
     /**
      * @requires PHP 7.0
      */
-    public function testNotFoundContentType()
-    {
+    public function testNotFoundContentType(): void {
         $errorMock = $this->getMockBuilder(PhpError::class)->setMethods(['determineContentType'])->getMock();
         $errorMock->method('determineContentType')
             ->willReturn('unknown/type');
@@ -87,8 +83,7 @@ class PhpErrorTest extends TestCase
      * @requires PHP 5.0
      * @dataProvider phpErrorProvider
      */
-    public function testPhpError5($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testPhpError5($acceptHeader, $contentType, $startOfBody): void {
         $this->skipIfPhp70();
         $error = new PhpError();
 
@@ -110,8 +105,7 @@ class PhpErrorTest extends TestCase
      *
      * @dataProvider phpErrorProvider
      */
-    public function testPhpErrorDisplayDetails5($acceptHeader, $contentType, $startOfBody)
-    {
+    public function testPhpErrorDisplayDetails5($acceptHeader, $contentType, $startOfBody): void {
         $this->skipIfPhp70();
 
         $error = new PhpError(true);
@@ -142,15 +136,14 @@ class PhpErrorTest extends TestCase
      * @requires PHP 5.0
      * @expectedException UnexpectedValueException
      */
-    public function testNotFoundContentType5()
-    {
+    public function testNotFoundContentType5(): void {
         $this->skipIfPhp70();
         $errorMock = $this->getMock(PhpError::class, ['determineContentType']);
         $errorMock->method('determineContentType')
             ->will($this->returnValue('unknown/type'));
 
         $throwable = $this->getMockBuilder('Throwable')->getMock();
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
 
         $errorMock->__invoke($req, new Response(), $throwable);
     }
@@ -162,7 +155,7 @@ class PhpErrorTest extends TestCase
      */
     protected function getRequest($method, $acceptHeader)
     {
-        $req = $this->getMockBuilder('Slim\Http\Request')->disableOriginalConstructor()->getMock();
+        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $req->expects($this->once())->method('getHeaderLine')->willReturn($acceptHeader);
 
         return $req;
@@ -173,7 +166,7 @@ class PhpErrorTest extends TestCase
      */
     protected function skipIfPhp70()
     {
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
+        if (PHP_VERSION_ID >= 70000) {
             $this->markTestSkipped();
         }
     }

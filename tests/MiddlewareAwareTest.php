@@ -16,11 +16,12 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\Uri;
 use Slim\Tests\Mocks\Stackable;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class MiddlewareAwareTest extends TestCase
 {
-    public function testSeedsMiddlewareStack()
-    {
+    public function testSeedsMiddlewareStack(): void {
         $stack = new Stackable;
         $bottom = null;
 
@@ -30,15 +31,14 @@ class MiddlewareAwareTest extends TestCase
         });
 
         $stack->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->getMockBuilder(ServerRequestInterface::class)->disableOriginalConstructor()->getMock(),
+            $this->getMockBuilder(ResponseInterface::class)->disableOriginalConstructor()->getMock()
         );
 
         $this->assertSame($stack, $bottom);
     }
 
-    public function testCallMiddlewareStack()
-    {
+    public function testCallMiddlewareStack(): void {
         // Build middleware stack
         $stack = new Stackable;
         $stack->add(function ($req, $res, $next) {
@@ -72,8 +72,7 @@ class MiddlewareAwareTest extends TestCase
         $this->assertEquals('In2In1CenterOut1Out2', (string)$res->getBody());
     }
 
-    public function testMiddlewareStackWithAStatic()
-    {
+    public function testMiddlewareStackWithAStatic(): void {
         // Build middleware stack
         $stack = new Stackable;
         $stack->add('Slim\Tests\Mocks\StaticCallable::run')
@@ -105,8 +104,7 @@ class MiddlewareAwareTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testMiddlewareBadReturnValue()
-    {
+    public function testMiddlewareBadReturnValue(): void {
         // Build middleware stack
         $stack = new Stackable;
         $stack->add(function ($req, $res, $next) {
@@ -132,8 +130,7 @@ class MiddlewareAwareTest extends TestCase
         $stack->callMiddlewareStack($request, $response);
     }
 
-    public function testAlternativeSeedMiddlewareStack()
-    {
+    public function testAlternativeSeedMiddlewareStack(): void {
         $stack = new Stackable;
         $stack->alternativeSeed();
         $bottom = null;
@@ -144,16 +141,15 @@ class MiddlewareAwareTest extends TestCase
         });
 
         $stack->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->getMockBuilder(ServerRequestInterface::class)->disableOriginalConstructor()->getMock(),
+            $this->getMockBuilder(ResponseInterface::class)->disableOriginalConstructor()->getMock()
         );
 
         $this->assertSame([$stack, 'testMiddlewareKernel'], $bottom);
     }
 
 
-    public function testAddMiddlewareWhileStackIsRunningThrowException()
-    {
+    public function testAddMiddlewareWhileStackIsRunningThrowException(): void {
         $stack = new Stackable;
         $stack->add(function ($req, $resp) use ($stack) {
             $stack->add(function ($req, $resp) {
@@ -163,13 +159,12 @@ class MiddlewareAwareTest extends TestCase
         });
         $this->setExpectedException('RuntimeException');
         $stack->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->getMockBuilder(ServerRequestInterface::class)->disableOriginalConstructor()->getMock(),
+            $this->getMockBuilder(ResponseInterface::class)->disableOriginalConstructor()->getMock()
         );
     }
 
-    public function testSeedTwiceThrowException()
-    {
+    public function testSeedTwiceThrowException(): void {
         $stack = new Stackable;
         $stack->alternativeSeed();
         $this->setExpectedException('RuntimeException');

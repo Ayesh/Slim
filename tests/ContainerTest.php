@@ -11,6 +11,12 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Slim\Container;
+use Slim\Handlers\NotAllowed;
+use Slim\Handlers\Error;
+use Slim\Router;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\RequestInterface;
+use Slim\Http\Environment;
 
 class ContainerTest extends TestCase
 {
@@ -24,13 +30,11 @@ class ContainerTest extends TestCase
         $this->container = new Container;
     }
 
-    public function testGet()
-    {
-        $this->assertInstanceOf('\Slim\Http\Environment', $this->container->get('environment'));
+    public function testGet(): void {
+        $this->assertInstanceOf(Environment::class, $this->container->get('environment'));
     }
 
-    public function testGetWithValueNotFoundError()
-    {
+    public function testGetWithValueNotFoundError(): void {
         $this->expectException(\Slim\Exception\ContainerValueNotFoundException::class);
         $this->container->get('foo');
     }
@@ -39,8 +43,7 @@ class ContainerTest extends TestCase
      * Test `get()` throws something that is a ContainerException - typically a NotFoundException, when there is a DI
      * config error
      */
-    public function testGetWithDiConfigErrorThrownAsContainerValueNotFoundException()
-    {
+    public function testGetWithDiConfigErrorThrownAsContainerValueNotFoundException(): void {
         $container = new Container;
         $container['foo'] =
             function (ContainerInterface $container) {
@@ -55,8 +58,7 @@ class ContainerTest extends TestCase
      * Test `get()` recasts InvalidArgumentException as psr/container exceptions when an error is present
      * in the DI config
      */
-    public function testGetWithDiConfigErrorThrownAsInvalidArgumentException()
-    {
+    public function testGetWithDiConfigErrorThrownAsInvalidArgumentException(): void {
         $container = new Container;
         $container['foo'] =
             function (ContainerInterface $container) {
@@ -70,8 +72,7 @@ class ContainerTest extends TestCase
     /**
      * Test `get()` does not recast exceptions which are thrown in a factory closure
      */
-    public function testGetWithErrorThrownByFactoryClosure()
-    {
+    public function testGetWithErrorThrownByFactoryClosure(): void {
         $invokable = $this->getMockBuilder('StdClass')->setMethods(['__invoke'])->getMock();
         /** @var callable $invokable */
         $invokable->expects($this->any())
@@ -88,52 +89,43 @@ class ContainerTest extends TestCase
         $container->get('foo');
     }
 
-    public function testGetRequest()
-    {
-        $this->assertInstanceOf('\Psr\Http\Message\RequestInterface', $this->container['request']);
+    public function testGetRequest(): void {
+        $this->assertInstanceOf(RequestInterface::class, $this->container['request']);
     }
 
-    public function testGetResponse()
-    {
-        $this->assertInstanceOf('\Psr\Http\Message\ResponseInterface', $this->container['response']);
+    public function testGetResponse(): void {
+        $this->assertInstanceOf(ResponseInterface::class, $this->container['response']);
     }
 
-    public function testGetRouter()
-    {
-        $this->assertInstanceOf('\Slim\Router', $this->container['router']);
+    public function testGetRouter(): void {
+        $this->assertInstanceOf(Router::class, $this->container['router']);
     }
 
-    public function testGetErrorHandler()
-    {
-        $this->assertInstanceOf('\Slim\Handlers\Error', $this->container['errorHandler']);
+    public function testGetErrorHandler(): void {
+        $this->assertInstanceOf(Error::class, $this->container['errorHandler']);
     }
 
-    public function testGetNotAllowedHandler()
-    {
-        $this->assertInstanceOf('\Slim\Handlers\NotAllowed', $this->container['notAllowedHandler']);
+    public function testGetNotAllowedHandler(): void {
+        $this->assertInstanceOf(NotAllowed::class, $this->container['notAllowedHandler']);
     }
 
-    public function testSettingsCanBeEdited()
-    {
+    public function testSettingsCanBeEdited(): void {
         $this->assertSame('1.1', $this->container->get('settings')['httpVersion']);
 
         $this->container->get('settings')['httpVersion'] = '1.2';
         $this->assertSame('1.2', $this->container->get('settings')['httpVersion']);
     }
 
-    public function testMagicIssetMethod()
-    {
-        $this->assertEquals(true, $this->container->__isset('settings'));
+    public function testMagicIssetMethod(): void {
+        $this->assertTrue($this->container->__isset('settings'));
     }
 
-    public function testMagicGetMethod()
-    {
+    public function testMagicGetMethod(): void {
         $this->container->get('settings')['httpVersion'] = '1.2';
         $this->assertSame('1.2', $this->container->__get('settings')['httpVersion']);
     }
 
-    public function testRouteCacheDisabledByDefault()
-    {
+    public function testRouteCacheDisabledByDefault(): void {
         $this->assertFalse($this->container->get('settings')['routerCacheFile']);
     }
 }

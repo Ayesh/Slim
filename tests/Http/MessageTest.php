@@ -17,16 +17,14 @@ use Slim\Tests\Mocks\MessageStub;
 
 class MessageTest extends TestCase
 {
-    public function testGetProtocolVersion()
-    {
+    public function testGetProtocolVersion(): void {
         $message = new MessageStub();
         $message->protocolVersion = '1.0';
 
         $this->assertEquals('1.0', $message->getProtocolVersion());
     }
 
-    public function testWithProtocolVersion()
-    {
+    public function testWithProtocolVersion(): void {
         $message = new MessageStub();
         $clone = $message->withProtocolVersion('1.0');
 
@@ -36,22 +34,19 @@ class MessageTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testWithProtocolVersionInvalidThrowsException()
-    {
+    public function testWithProtocolVersionInvalidThrowsException(): void {
         $message = new MessageStub();
         $message->withProtocolVersion('3.0');
     }
 
-    public function testWithProtocolVersionForHttp2()
-    {
+    public function testWithProtocolVersionForHttp2(): void {
         $message = new MessageStub();
         $clone = $message->withProtocolVersion('2');
 
         $this->assertEquals('2', $clone->protocolVersion);
     }
 
-    public function testGetHeaders()
-    {
+    public function testGetHeaders(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
         $headers->add('X-Foo', 'two');
@@ -71,8 +66,7 @@ class MessageTest extends TestCase
         $this->assertEquals($shouldBe, $message->getHeaders());
     }
 
-    public function testHasHeader()
-    {
+    public function testHasHeader(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
 
@@ -83,8 +77,7 @@ class MessageTest extends TestCase
         $this->assertFalse($message->hasHeader('X-Bar'));
     }
 
-    public function testGetHeaderLine()
-    {
+    public function testGetHeaderLine(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
         $headers->add('X-Foo', 'two');
@@ -97,8 +90,7 @@ class MessageTest extends TestCase
         $this->assertEquals('', $message->getHeaderLine('X-Bar'));
     }
 
-    public function testGetHeader()
-    {
+    public function testGetHeader(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
         $headers->add('X-Foo', 'two');
@@ -111,8 +103,7 @@ class MessageTest extends TestCase
         $this->assertEquals([], $message->getHeader('X-Bar'));
     }
 
-    public function testWithHeader()
-    {
+    public function testWithHeader(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
         $message = new MessageStub();
@@ -122,8 +113,7 @@ class MessageTest extends TestCase
         $this->assertEquals('bar', $clone->getHeaderLine('X-Foo'));
     }
 
-    public function testWithAddedHeader()
-    {
+    public function testWithAddedHeader(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
         $message = new MessageStub();
@@ -133,8 +123,7 @@ class MessageTest extends TestCase
         $this->assertEquals('one,two', $clone->getHeaderLine('X-Foo'));
     }
 
-    public function testWithoutHeader()
-    {
+    public function testWithoutHeader(): void {
         $headers = new Headers();
         $headers->add('X-Foo', 'one');
         $headers->add('X-Bar', 'two');
@@ -148,8 +137,7 @@ class MessageTest extends TestCase
         $this->assertEquals($shouldBe, $clone->getHeaders());
     }
 
-    public function testGetBody()
-    {
+    public function testGetBody(): void {
         $body = $this->getBody();
         $message = new MessageStub();
         $message->body = $body;
@@ -157,8 +145,7 @@ class MessageTest extends TestCase
         $this->assertSame($body, $message->getBody());
     }
 
-    public function testWithBody()
-    {
+    public function testWithBody(): void {
         $body = $this->getBody();
         $body2 = $this->getBody();
         $message = new MessageStub();
@@ -175,7 +162,7 @@ class MessageTest extends TestCase
     protected function getBody()
     {
         return $this
-            ->getMockBuilder('Slim\Http\Body')
+            ->getMockBuilder(Body::class)
             ->disableOriginalConstructor()
             ->getMock();
     }

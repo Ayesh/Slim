@@ -16,8 +16,8 @@ interface RouterInterface
     /**
      * Route result constants
      */
-    const DISPATCH_STATUS = 0;
-    const ALLOWED_METHODS = 1;
+    const int DISPATCH_STATUS = 0;
+    const int ALLOWED_METHODS = 1;
 
     /**
      * Add route
