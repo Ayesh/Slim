@@ -28,7 +28,7 @@ class DeferredCallable
      * @param callable|string $callable
      * @param ContainerInterface $container
      */
-    public function __construct($callable, ContainerInterface $container = null)
+    public function __construct($callable, ?ContainerInterface $container = null)
     {
         $this->callable = $callable;
         $this->container = $container;

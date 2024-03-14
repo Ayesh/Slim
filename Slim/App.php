@@ -547,7 +547,7 @@ class App
         array $headers = [],
         array $cookies = [],
         $bodyContent = '',
-        ResponseInterface $response = null
+        ?ResponseInterface $response = null
     ) {
         $env = $this->container->get('environment');
         $uri = Uri::createFromEnvironment($env)->withPath($path)->withQuery($query);

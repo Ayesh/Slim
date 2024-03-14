@@ -15,7 +15,7 @@ class RouteGroup extends Routable implements RouteGroupInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke(App $app = null)
+    public function __invoke(?App $app = null)
     {
         $callable = $this->resolveCallable($this->callable);
         if ($callable instanceof Closure && $app !== null) {

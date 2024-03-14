@@ -87,7 +87,7 @@ trait MiddlewareAwareTrait
      *
      * @throws RuntimeException if the stack is seeded more than once
      */
-    protected function seedMiddlewareStack(callable $kernel = null)
+    protected function seedMiddlewareStack(?callable $kernel = null)
     {
         if (!is_null($this->tip)) {
             throw new RuntimeException('MiddlewareStack can only be seeded once.');
