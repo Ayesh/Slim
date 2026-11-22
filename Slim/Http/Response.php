@@ -220,7 +220,7 @@ class Response extends Message implements ResponseInterface
      */
     protected function filterStatus($status)
     {
-        if (!is_integer($status) ||
+        if (!is_int($status) ||
             $status<StatusCode::HTTP_CONTINUE ||
             $status>StatusCode::HTTP_NETWORK_CONNECTION_TIMEOUT_ERROR
         ) {
