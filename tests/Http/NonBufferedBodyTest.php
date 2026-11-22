@@ -25,8 +25,7 @@ class NonBufferedBodyTest extends TestCase
         HeaderStack::reset();
     }
 
-    public function testTheStreamContract()
-    {
+    public function testTheStreamContract(): void {
         $body = new NonBufferedBody();
         $body->close();
         $body->seek(0);
@@ -45,8 +44,7 @@ class NonBufferedBodyTest extends TestCase
         self::assertNull($body->getMetadata(), 'Metadata mechanism is not implemented');
     }
 
-    public function testWrite()
-    {
+    public function testWrite(): void {
         $ob_initial_level = ob_get_level();
 
         // Start output buffering.
@@ -76,8 +74,7 @@ class NonBufferedBodyTest extends TestCase
         $this->assertEquals('buffer content: hello world', $contents);
     }
 
-    public function testWithHeader()
-    {
+    public function testWithHeader(): void {
         (new Response())
             ->withBody(new NonBufferedBody())
             ->withHeader('Foo', 'Bar');
@@ -91,8 +88,7 @@ class NonBufferedBodyTest extends TestCase
         ], HeaderStack::stack());
     }
 
-    public function testWithAddedHeader()
-    {
+    public function testWithAddedHeader(): void {
         (new Response())
             ->withBody(new NonBufferedBody())
             ->withHeader('Foo', 'Bar')
@@ -113,8 +109,7 @@ class NonBufferedBodyTest extends TestCase
     }
 
 
-    public function testWithoutHeader()
-    {
+    public function testWithoutHeader(): void {
         (new Response())
             ->withBody(new NonBufferedBody())
             ->withHeader('Foo', 'Bar')

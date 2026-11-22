@@ -87,8 +87,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return array|null
      */
-    public static function createFromEnvironment(Environment $env)
-    {
+    public static function createFromEnvironment(Environment $env): ?array {
         if (is_array($env['slim.files']) && $env->has('slim.files')) {
             return $env['slim.files'];
         } elseif (! empty($_FILES)) {
@@ -107,8 +106,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return array
      */
-    private static function parseUploadedFiles(array $uploadedFiles)
-    {
+    private static function parseUploadedFiles(array $uploadedFiles): array {
         $parsed = [];
         foreach ($uploadedFiles as $field => $uploadedFile) {
             if (!isset($uploadedFile['error'])) {
@@ -225,8 +223,7 @@ class UploadedFile implements UploadedFileInterface
      * @throws InvalidArgumentException If the $path specified is invalid.
      * @throws RuntimeException On any error during the move operation or on the second subsequent call to the method.
      */
-    public function moveTo($targetPath)
-    {
+    public function moveTo($targetPath): void {
         if ($this->moved) {
             throw new RuntimeException('Uploaded file already moved');
         }
@@ -251,10 +248,8 @@ class UploadedFile implements UploadedFileInterface
             if (!move_uploaded_file($this->file, $targetPath)) {
                 throw new RuntimeException(sprintf('Error moving uploaded file %s to %s', $this->name, $targetPath));
             }
-        } else {
-            if (!rename($this->file, $targetPath)) {
-                throw new RuntimeException(sprintf('Error moving uploaded file %s to %s', $this->name, $targetPath));
-            }
+        } elseif (!rename($this->file, $targetPath)) {
+            throw new RuntimeException(sprintf('Error moving uploaded file %s to %s', $this->name, $targetPath));
         }
 
         $this->moved = true;
@@ -275,8 +270,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return int
      */
-    public function getError()
-    {
+    public function getError(): int {
         return $this->error;
     }
 
@@ -292,8 +286,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return string|null
      */
-    public function getClientFilename()
-    {
+    public function getClientFilename(): ?string {
         return $this->name;
     }
 
@@ -309,8 +302,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return string|null
      */
-    public function getClientMediaType()
-    {
+    public function getClientMediaType(): ?string {
         return $this->type;
     }
 
@@ -323,8 +315,7 @@ class UploadedFile implements UploadedFileInterface
      *
      * @return int|null
      */
-    public function getSize()
-    {
+    public function getSize(): ?int {
         return $this->size;
     }
 }

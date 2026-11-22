@@ -14,8 +14,7 @@ use Slim\Tests\Mocks\CallableTest;
 
 class DeferredCallableTest extends TestCase
 {
-    public function testItResolvesCallable()
-    {
+    public function testItResolvesCallable(): void {
         $container = new Container();
         $container['CallableTest'] = new CallableTest;
 
@@ -25,8 +24,7 @@ class DeferredCallableTest extends TestCase
         $this->assertEquals(1, CallableTest::$CalledCount);
     }
 
-    public function testItBindsClosuresToContainer()
-    {
+    public function testItBindsClosuresToContainer(): void {
         $assertCalled = $this->getMockBuilder('StdClass')->setMethods(['foo'])->getMock();
         $assertCalled
             ->expects($this->once())
@@ -45,8 +43,7 @@ class DeferredCallableTest extends TestCase
         $deferred();
     }
 
-    public function testItReturnsInvokedCallableResponse()
-    {
+    public function testItReturnsInvokedCallableResponse(): void {
         $container = new Container();
         $test = $this;
         $foo = 'foo';
@@ -63,8 +60,7 @@ class DeferredCallableTest extends TestCase
         $this->assertEquals($bar, $response);
     }
 
-    public function testGetCallable()
-    {
+    public function testGetCallable(): void {
         $container = new Container();
 
         $closure = function () {

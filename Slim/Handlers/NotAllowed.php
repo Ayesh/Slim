@@ -68,8 +68,7 @@ class NotAllowed extends AbstractHandler
      *
      * @return string
      */
-    protected function renderPlainOptionsMessage($methods)
-    {
+    protected function renderPlainOptionsMessage($methods): string {
         $allow = implode(', ', $methods);
 
         return 'Allowed methods: ' . $allow;
@@ -82,8 +81,7 @@ class NotAllowed extends AbstractHandler
      *
      * @return string
      */
-    protected function renderJsonNotAllowedMessage($methods)
-    {
+    protected function renderJsonNotAllowedMessage($methods): string {
         $allow = implode(', ', $methods);
 
         return '{"message":"Method not allowed. Must be one of: ' . $allow . '"}';
@@ -96,8 +94,7 @@ class NotAllowed extends AbstractHandler
      *
      * @return string
      */
-    protected function renderXmlNotAllowedMessage($methods)
-    {
+    protected function renderXmlNotAllowedMessage($methods): string {
         $allow = implode(', ', $methods);
 
         return "<root><message>Method not allowed. Must be one of: $allow</message></root>";
@@ -110,8 +107,7 @@ class NotAllowed extends AbstractHandler
      *
      * @return string
      */
-    protected function renderHtmlNotAllowedMessage($methods)
-    {
+    protected function renderHtmlNotAllowedMessage($methods): string {
         $allow = implode(', ', $methods);
         $output = <<<END
 <html>

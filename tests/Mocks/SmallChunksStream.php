@@ -12,8 +12,8 @@ use Psr\Http\Message\StreamInterface;
 
 class SmallChunksStream implements StreamInterface
 {
-    const CHUNK_SIZE = 10;
-    const SIZE = 40;
+    public const CHUNK_SIZE = 10;
+    public const SIZE = 40;
 
     /**
      * @var int
@@ -33,28 +33,24 @@ class SmallChunksStream implements StreamInterface
         throw new Exception('not implemented');
     }
 
-    public function close()
-    {
+    public function close(): void {
     }
 
     /**
      * @throws Exception
      */
-    public function detach()
-    {
+    public function detach(): void {
         throw new Exception('not implemented');
     }
 
-    public function eof()
-    {
+    public function eof(): bool {
         return $this->amountToRead === 0;
     }
 
     /**
      * @throws Exception
      */
-    public function getContents()
-    {
+    public function getContents(): void {
         throw new Exception('not implemented');
     }
 
@@ -63,33 +59,27 @@ class SmallChunksStream implements StreamInterface
      *
      * @throws Exception
      */
-    public function getMetadata($key = null)
-    {
+    public function getMetadata($key = null): void {
         throw new Exception('not implemented');
     }
 
-    public function getSize()
-    {
+    public function getSize(): int {
         return self::SIZE;
     }
 
-    public function isReadable()
-    {
+    public function isReadable(): bool {
         return true;
     }
 
-    public function isSeekable()
-    {
+    public function isSeekable(): bool {
         return false;
     }
 
-    public function isWritable()
-    {
+    public function isWritable(): bool {
         return false;
     }
 
-    public function read($length)
-    {
+    public function read($length): string {
         $size = min($this->amountToRead, self::CHUNK_SIZE, $length);
         $this->amountToRead -= $size;
 
@@ -99,29 +89,25 @@ class SmallChunksStream implements StreamInterface
     /**
      * @throws Exception
      */
-    public function rewind()
-    {
+    public function rewind(): void {
         throw new Exception('not implemented');
     }
 
     /**
      * @throws Exception
      */
-    public function seek($offset, $whence = SEEK_SET)
-    {
+    public function seek($offset, $whence = SEEK_SET): void {
         throw new Exception('not implemented');
     }
 
     /**
      * @throws Exception
      */
-    public function tell()
-    {
+    public function tell(): void {
         throw new Exception('not implemented');
     }
 
-    public function write($string)
-    {
+    public function write($string): int {
         return strlen($string);
     }
 }

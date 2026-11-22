@@ -25,8 +25,7 @@ use Slim\Http\Uri;
 
 class RequestTest extends TestCase
 {
-    public function requestFactory($envData = [])
-    {
+    public function requestFactory($envData = []): Request {
         $env = Environment::mock($envData);
 
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
@@ -43,23 +42,20 @@ class RequestTest extends TestCase
         return $request;
     }
 
-    public function testDisableSetter()
-    {
+    public function testDisableSetter(): void {
         $request = $this->requestFactory();
         $request->foo = 'bar';
 
         $this->assertFalse(property_exists($request, 'foo'));
     }
 
-    public function testDoesNotAddHostHeaderFromUriIfAlreadySet()
-    {
+    public function testDoesNotAddHostHeaderFromUriIfAlreadySet(): void {
         $request = $this->requestFactory();
 
         $this->assertEquals('localhost', $request->getHeaderLine('Host'));
     }
 
-    public function testAddsHostHeaderFromUriIfNotSet()
-    {
+    public function testAddsHostHeaderFromUriIfNotSet(): void {
         $env = Environment::mock();
 
         $uri = Uri::createFromString('https://example.com/foo/bar?abc=123');
@@ -81,8 +77,7 @@ class RequestTest extends TestCase
         $this->assertEquals('example.com', $request->getHeaderLine('Host'));
     }
 
-    public function testAddsPortToHostHeaderIfSetWhenHostHeaderIsMissingFromRequest()
-    {
+    public function testAddsPortToHostHeaderIfSetWhenHostHeaderIsMissingFromRequest(): void {
         $env = Environment::mock();
 
         $uri = Uri::createFromString('https://example.com:8443/foo/bar?abc=123');
@@ -104,8 +99,7 @@ class RequestTest extends TestCase
         $this->assertEquals('example.com:8443', $request->getHeaderLine('Host'));
     }
 
-    public function testDoesntAddHostHeaderFromUriIfNeitherAreSet()
-    {
+    public function testDoesntAddHostHeaderFromUriIfNeitherAreSet(): void {
         $env = Environment::mock();
 
         $uri = Uri::createFromString('https://example.com/foo/bar?abc=123')
@@ -128,26 +122,22 @@ class RequestTest extends TestCase
         $this->assertEquals('', $request->getHeaderLine('Host'));
     }
 
-    public function testGetMethod()
-    {
+    public function testGetMethod(): void {
         $this->assertEquals('GET', $this->requestFactory()->getMethod());
     }
 
-    public function testGetOriginalMethod()
-    {
+    public function testGetOriginalMethod(): void {
         $this->assertEquals('GET', $this->requestFactory()->getOriginalMethod());
     }
 
-    public function testWithMethod()
-    {
+    public function testWithMethod(): void {
         $request = $this->requestFactory()->withMethod('PUT');
 
         $this->assertAttributeEquals('PUT', 'method', $request);
         $this->assertAttributeEquals('PUT', 'originalMethod', $request);
     }
 
-    public function testWithAllAllowedCharactersMethod()
-    {
+    public function testWithAllAllowedCharactersMethod(): void {
         $request = $this->requestFactory()->withMethod("!#$%&'*+.^_`|~09AZ-");
 
         $this->assertAttributeEquals("!#$%&'*+.^_`|~09AZ-", 'method', $request);
@@ -157,20 +147,17 @@ class RequestTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testWithMethodInvalid()
-    {
+    public function testWithMethodInvalid(): void {
         $this->requestFactory()->withMethod('B@R');
     }
 
-    public function testWithMethodNull()
-    {
+    public function testWithMethodNull(): void {
         $request = $this->requestFactory()->withMethod(null);
 
         $this->assertAttributeEquals(null, 'originalMethod', $request);
     }
 
-    public function testCreateFromEnvironment()
-    {
+    public function testCreateFromEnvironment(): void {
         $env = Environment::mock([
             'SCRIPT_NAME' => '/index.php',
             'REQUEST_URI' => '/foo',
@@ -182,8 +169,7 @@ class RequestTest extends TestCase
         $this->assertEquals($env->all(), $request->getServerParams());
     }
 
-    public function testCreateFromEnvironmentWithMultipart()
-    {
+    public function testCreateFromEnvironmentWithMultipart(): void {
         $_POST['foo'] = 'bar';
 
         $env = Environment::mock([
@@ -199,8 +185,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
     }
 
-    public function testCreateFromEnvironmentWithMultipartAndQueryParams()
-    {
+    public function testCreateFromEnvironmentWithMultipartAndQueryParams(): void {
         $_POST['123'] = 'bar';
 
         $env = Environment::mock([
@@ -219,8 +204,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['123' => 'zar'], $request->getQueryParams());
     }
 
-    public function testCreateFromEnvironmentWithMultipartMethodOverride()
-    {
+    public function testCreateFromEnvironmentWithMultipartMethodOverride(): void {
         $_POST['_METHOD'] = 'PUT';
 
         $env = Environment::mock([
@@ -237,8 +221,7 @@ class RequestTest extends TestCase
         $this->assertEquals('PUT', $request->getMethod());
     }
 
-    public function testGetMethodWithOverrideHeader()
-    {
+    public function testGetMethodWithOverrideHeader(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers([
             'HTTP_X_HTTP_METHOD_OVERRIDE' => 'PUT',
@@ -252,8 +235,7 @@ class RequestTest extends TestCase
         $this->assertEquals('POST', $request->getOriginalMethod());
     }
 
-    public function testGetMethodWithOverrideParameterFromBodyObject()
-    {
+    public function testGetMethodWithOverrideParameterFromBodyObject(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers([
             'Content-Type' => 'application/x-www-form-urlencoded',
@@ -269,8 +251,7 @@ class RequestTest extends TestCase
         $this->assertEquals('POST', $request->getOriginalMethod());
     }
 
-    public function testGetMethodOverrideParameterFromBodyArray()
-    {
+    public function testGetMethodOverrideParameterFromBodyArray(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers([
             'Content-Type' => 'application/x-www-form-urlencoded',
@@ -292,8 +273,7 @@ class RequestTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testCreateRequestWithInvalidMethodString()
-    {
+    public function testCreateRequestWithInvalidMethodString(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers();
         $cookies = [];
@@ -305,8 +285,7 @@ class RequestTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testCreateRequestWithInvalidMethodOther()
-    {
+    public function testCreateRequestWithInvalidMethodOther(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers();
         $cookies = [];
@@ -315,8 +294,7 @@ class RequestTest extends TestCase
         $request = new Request(10, $uri, $headers, $cookies, $serverParams, $body);
     }
 
-    public function testIsGet()
-    {
+    public function testIsGet(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -325,8 +303,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isGet());
     }
 
-    public function testIsPost()
-    {
+    public function testIsPost(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -335,8 +312,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isPost());
     }
 
-    public function testIsPut()
-    {
+    public function testIsPut(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -345,8 +321,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isPut());
     }
 
-    public function testIsPatch()
-    {
+    public function testIsPatch(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -355,8 +330,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isPatch());
     }
 
-    public function testIsDelete()
-    {
+    public function testIsDelete(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -365,8 +339,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isDelete());
     }
 
-    public function testIsHead()
-    {
+    public function testIsHead(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -375,8 +348,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isHead());
     }
 
-    public function testIsOptions()
-    {
+    public function testIsOptions(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'originalMethod');
         $prop->setAccessible(true);
@@ -385,8 +357,7 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isOptions());
     }
 
-    public function testIsXhr()
-    {
+    public function testIsXhr(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers([
             'Content-Type' => 'application/x-www-form-urlencoded',
@@ -400,13 +371,11 @@ class RequestTest extends TestCase
         $this->assertTrue($request->isXhr());
     }
 
-    public function testGetRequestTarget()
-    {
+    public function testGetRequestTarget(): void {
         $this->assertEquals('/foo/bar?abc=123', $this->requestFactory()->getRequestTarget());
     }
 
-    public function testGetRequestTargetAlreadySet()
-    {
+    public function testGetRequestTargetAlreadySet(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'requestTarget');
         $prop->setAccessible(true);
@@ -415,8 +384,7 @@ class RequestTest extends TestCase
         $this->assertEquals('/foo/bar?abc=123', $request->getRequestTarget());
     }
 
-    public function testGetRequestTargetIfNoUri()
-    {
+    public function testGetRequestTargetIfNoUri(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'uri');
         $prop->setAccessible(true);
@@ -425,8 +393,7 @@ class RequestTest extends TestCase
         $this->assertEquals('/', $request->getRequestTarget());
     }
 
-    public function testGetRequestTargetWithSlimPsr7Uri()
-    {
+    public function testGetRequestTargetWithSlimPsr7Uri(): void {
         $basePath = '/base/path';
         $path = 'foo';
         $query = 'bar=1';
@@ -447,8 +414,7 @@ class RequestTest extends TestCase
         $this->assertEquals($basePath . '/' . $path . '?' . $query, $request->getRequestTarget());
     }
 
-    public function testGetRequestTargetWithNonSlimPsr7Uri()
-    {
+    public function testGetRequestTargetWithNonSlimPsr7Uri(): void {
         // We still pass in a UriInterface, which isn't an instance of Slim URI
         $uriProphecy = $this->prophesize(UriInterface::class);
 
@@ -460,8 +426,7 @@ class RequestTest extends TestCase
         $this->assertEquals('/', $request->getRequestTarget());
     }
 
-    public function testWithRequestTarget()
-    {
+    public function testWithRequestTarget(): void {
         $clone = $this->requestFactory()->withRequestTarget('/test?user=1');
 
         $this->assertAttributeEquals('/test?user=1', 'requestTarget', $clone);
@@ -470,13 +435,11 @@ class RequestTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testWithRequestTargetThatHasSpaces()
-    {
+    public function testWithRequestTargetThatHasSpaces(): void {
         $this->requestFactory()->withRequestTarget('/test/m ore/stuff?user=1');
     }
 
-    public function testGetUri()
-    {
+    public function testGetUri(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers();
         $cookies = [];
@@ -487,8 +450,7 @@ class RequestTest extends TestCase
         $this->assertSame($uri, $request->getUri());
     }
 
-    public function testWithUri()
-    {
+    public function testWithUri(): void {
         // Uris
         $uri1 = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $uri2 = Uri::createFromString('https://example2.com:443/test?xyz=123');
@@ -504,8 +466,7 @@ class RequestTest extends TestCase
         $this->assertAttributeSame($uri2, 'uri', $clone);
     }
 
-    public function testWithUriPreservesHost()
-    {
+    public function testWithUriPreservesHost(): void {
         // When `$preserveHost` is set to `true`, this method interacts with
         // the Host header in the following ways:
 
@@ -540,8 +501,7 @@ class RequestTest extends TestCase
         $this->assertSame('example.com', $clone->getHeaderLine('Host'));
     }
 
-    public function testGetContentType()
-    {
+    public function testGetContentType(): void {
         $headers = new Headers([
             'Content-Type' => ['application/json;charset=utf8'],
         ]);
@@ -553,15 +513,13 @@ class RequestTest extends TestCase
         $this->assertEquals('application/json;charset=utf8', $request->getContentType());
     }
 
-    public function testGetContentTypeEmpty()
-    {
+    public function testGetContentTypeEmpty(): void {
         $request = $this->requestFactory();
 
         $this->assertNull($request->getContentType());
     }
 
-    public function testGetMediaType()
-    {
+    public function testGetMediaType(): void {
         $headers = new Headers([
             'Content-Type' => ['application/json;charset=utf8'],
         ]);
@@ -573,15 +531,13 @@ class RequestTest extends TestCase
         $this->assertEquals('application/json', $request->getMediaType());
     }
 
-    public function testGetMediaTypeEmpty()
-    {
+    public function testGetMediaTypeEmpty(): void {
         $request = $this->requestFactory();
 
         $this->assertNull($request->getMediaType());
     }
 
-    public function testGetMediaTypeParams()
-    {
+    public function testGetMediaTypeParams(): void {
         $headers = new Headers([
             'Content-Type' => ['application/json;charset=utf8;foo=bar'],
         ]);
@@ -593,8 +549,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['charset' => 'utf8', 'foo' => 'bar'], $request->getMediaTypeParams());
     }
 
-    public function testGetMediaTypeParamsEmpty()
-    {
+    public function testGetMediaTypeParamsEmpty(): void {
         $headers = new Headers([
             'Content-Type' => ['application/json'],
         ]);
@@ -606,15 +561,13 @@ class RequestTest extends TestCase
         $this->assertEquals([], $request->getMediaTypeParams());
     }
 
-    public function testGetMediaTypeParamsWithoutHeader()
-    {
+    public function testGetMediaTypeParamsWithoutHeader(): void {
         $request = $this->requestFactory();
 
         $this->assertEquals([], $request->getMediaTypeParams());
     }
 
-    public function testGetContentCharset()
-    {
+    public function testGetContentCharset(): void {
         $headers = new Headers([
             'Content-Type' => ['application/json;charset=utf8'],
         ]);
@@ -626,8 +579,7 @@ class RequestTest extends TestCase
         $this->assertEquals('utf8', $request->getContentCharset());
     }
 
-    public function testGetContentCharsetEmpty()
-    {
+    public function testGetContentCharsetEmpty(): void {
         $headers = new Headers([
             'Content-Type' => ['application/json'],
         ]);
@@ -639,15 +591,13 @@ class RequestTest extends TestCase
         $this->assertNull($request->getContentCharset());
     }
 
-    public function testGetContentCharsetWithoutHeader()
-    {
+    public function testGetContentCharsetWithoutHeader(): void {
         $request = $this->requestFactory();
 
         $this->assertNull($request->getContentCharset());
     }
 
-    public function testGetContentLength()
-    {
+    public function testGetContentLength(): void {
         $headers = new Headers([
             'Content-Length' => '150', // <-- Note we define as a string
         ]);
@@ -659,29 +609,25 @@ class RequestTest extends TestCase
         $this->assertEquals(150, $request->getContentLength());
     }
 
-    public function testGetContentLengthWithoutHeader()
-    {
+    public function testGetContentLengthWithoutHeader(): void {
         $request = $this->requestFactory();
 
         $this->assertNull($request->getContentLength());
     }
 
-    public function testGetCookieParam()
-    {
+    public function testGetCookieParam(): void {
         $shouldBe = 'john';
 
         $this->assertEquals($shouldBe, $this->requestFactory()->getCookieParam('user'));
     }
 
-    public function testGetCookieParamWithDefault()
-    {
+    public function testGetCookieParamWithDefault(): void {
         $shouldBe = 'bar';
 
         $this->assertEquals($shouldBe, $this->requestFactory()->getCookieParam('foo', 'bar'));
     }
 
-    public function testGetCookieParams()
-    {
+    public function testGetCookieParams(): void {
         $shouldBe = [
             'user' => 'john',
             'id' => '123',
@@ -690,21 +636,18 @@ class RequestTest extends TestCase
         $this->assertEquals($shouldBe, $this->requestFactory()->getCookieParams());
     }
 
-    public function testWithCookieParams()
-    {
+    public function testWithCookieParams(): void {
         $request = $this->requestFactory();
         $clone = $request->withCookieParams(['type' => 'framework']);
 
         $this->assertEquals(['type' => 'framework'], $clone->getCookieParams());
     }
 
-    public function testGetQueryParams()
-    {
+    public function testGetQueryParams(): void {
         $this->assertEquals(['abc' => '123'], $this->requestFactory()->getQueryParams());
     }
 
-    public function testGetQueryParamsAlreadySet()
-    {
+    public function testGetQueryParamsAlreadySet(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'queryParams');
         $prop->setAccessible(true);
@@ -713,8 +656,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getQueryParams());
     }
 
-    public function testWithQueryParams()
-    {
+    public function testWithQueryParams(): void {
         $request = $this->requestFactory();
         $clone = $request->withQueryParams(['foo' => 'bar']);
         $cloneUri = $clone->getUri();
@@ -723,8 +665,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $clone->getQueryParams()); // <-- Changed
     }
 
-    public function testWithQueryParamsEmptyArray()
-    {
+    public function testWithQueryParamsEmptyArray(): void {
         $request = $this->requestFactory();
         $clone = $request->withQueryParams([]);
         $cloneUri = $clone->getUri();
@@ -733,8 +674,7 @@ class RequestTest extends TestCase
         $this->assertEquals([], $clone->getQueryParams()); // <-- Changed
     }
 
-    public function testGetQueryParamsWithoutUri()
-    {
+    public function testGetQueryParamsWithoutUri(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'uri');
         $prop->setAccessible(true);
@@ -743,8 +683,7 @@ class RequestTest extends TestCase
         $this->assertEquals([], $request->getQueryParams());
     }
 
-    public function testWithUploadedFiles()
-    {
+    public function testWithUploadedFiles(): void {
         $files = [new UploadedFile('foo.txt'), new UploadedFile('bar.txt')];
 
         $request = $this->requestFactory();
@@ -754,8 +693,7 @@ class RequestTest extends TestCase
         $this->assertEquals($files, $clone->getUploadedFiles());
     }
 
-    public function testGetServerParams()
-    {
+    public function testGetServerParams(): void {
         $mockEnv = Environment::mock(["HTTP_AUTHORIZATION" => "test"]);
         $request = $this->requestFactory(["HTTP_AUTHORIZATION" => "test"]);
 
@@ -777,23 +715,20 @@ class RequestTest extends TestCase
         }
     }
 
-    public function testGetServerParam()
-    {
+    public function testGetServerParam(): void {
         $shouldBe = 'HTTP/1.1';
         $request = $this->requestFactory(['SERVER_PROTOCOL' => 'HTTP/1.1']);
 
         $this->assertEquals($shouldBe, $this->requestFactory()->getServerParam('SERVER_PROTOCOL'));
     }
 
-    public function testGetServerParamWithDefault()
-    {
+    public function testGetServerParamWithDefault(): void {
         $shouldBe = 'bar';
 
         $this->assertEquals($shouldBe, $this->requestFactory()->getServerParam('HTTP_NOT_EXIST', 'bar'));
     }
 
-    public function testGetAttributes()
-    {
+    public function testGetAttributes(): void {
         $request = $this->requestFactory();
         $attrProp = new ReflectionProperty($request, 'attributes');
         $attrProp->setAccessible(true);
@@ -802,8 +737,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getAttributes());
     }
 
-    public function testGetAttribute()
-    {
+    public function testGetAttribute(): void {
         $request = $this->requestFactory();
         $attrProp = new ReflectionProperty($request, 'attributes');
         $attrProp->setAccessible(true);
@@ -814,8 +748,7 @@ class RequestTest extends TestCase
         $this->assertEquals(2, $request->getAttribute('bar', 2));
     }
 
-    public function testWithAttribute()
-    {
+    public function testWithAttribute(): void {
         $request = $this->requestFactory();
         $attrProp = new ReflectionProperty($request, 'attributes');
         $attrProp->setAccessible(true);
@@ -825,8 +758,7 @@ class RequestTest extends TestCase
         $this->assertEquals('123', $clone->getAttribute('test'));
     }
 
-    public function testWithAttributes()
-    {
+    public function testWithAttributes(): void {
         $request = $this->requestFactory();
         $attrProp = new ReflectionProperty($request, 'attributes');
         $attrProp->setAccessible(true);
@@ -837,8 +769,7 @@ class RequestTest extends TestCase
         $this->assertEquals('123', $clone->getAttribute('test'));
     }
 
-    public function testWithoutAttribute()
-    {
+    public function testWithoutAttribute(): void {
         $request = $this->requestFactory();
         $attrProp = new ReflectionProperty($request, 'attributes');
         $attrProp->setAccessible(true);
@@ -848,8 +779,7 @@ class RequestTest extends TestCase
         $this->assertNull($clone->getAttribute('foo'));
     }
 
-    public function testGetParsedBodyForm()
-    {
+    public function testGetParsedBodyForm(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -862,8 +792,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
     }
 
-    public function testGetParsedBodyJson()
-    {
+    public function testGetParsedBodyJson(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -877,8 +806,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
     }
 
-    public function testGetParsedBodyInvalidJson()
-    {
+    public function testGetParsedBodyInvalidJson(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -892,8 +820,7 @@ class RequestTest extends TestCase
         $this->assertNull($request->getParsedBody());
     }
 
-    public function testGetParsedBodySemiValidJson()
-    {
+    public function testGetParsedBodySemiValidJson(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -907,8 +834,7 @@ class RequestTest extends TestCase
         $this->assertNull($request->getParsedBody());
     }
 
-    public function testGetParsedBodyWithJsonStructuredSuffix()
-    {
+    public function testGetParsedBodyWithJsonStructuredSuffix(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -922,8 +848,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
     }
 
-    public function testGetParsedBodyWithJsonStructuredSuffixAndRegisteredParser()
-    {
+    public function testGetParsedBodyWithJsonStructuredSuffixAndRegisteredParser(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -941,8 +866,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['data' => '{"foo":"bar"}'], $request->getParsedBody());
     }
 
-    public function testGetParsedBodyXml()
-    {
+    public function testGetParsedBodyXml(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -956,8 +880,7 @@ class RequestTest extends TestCase
         $this->assertEquals('Josh', $request->getParsedBody()->name);
     }
 
-    public function testGetParsedBodyWithXmlStructuredSuffix()
-    {
+    public function testGetParsedBodyWithXmlStructuredSuffix(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -971,8 +894,7 @@ class RequestTest extends TestCase
         $this->assertEquals('Josh', $request->getParsedBody()->name);
     }
 
-    public function testGetParsedBodyXmlWithTextXMLMediaType()
-    {
+    public function testGetParsedBodyXmlWithTextXMLMediaType(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -989,8 +911,7 @@ class RequestTest extends TestCase
     /**
      * Will fail if a simple_xml warning is created
      */
-    public function testInvalidXmlIsQuietForTextXml()
-    {
+    public function testInvalidXmlIsQuietForTextXml(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -1007,8 +928,7 @@ class RequestTest extends TestCase
     /**
      * Will fail if a simple_xml warning is created
      */
-    public function testInvalidXmlIsQuietForApplicationXml()
-    {
+    public function testInvalidXmlIsQuietForApplicationXml(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -1022,8 +942,7 @@ class RequestTest extends TestCase
         $this->assertEquals(null, $request->getParsedBody());
     }
 
-    public function testGetParsedBodyWhenAlreadyParsed()
-    {
+    public function testGetParsedBodyWhenAlreadyParsed(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'bodyParsed');
         $prop->setAccessible(true);
@@ -1032,8 +951,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getParsedBody());
     }
 
-    public function testGetParsedBodyWhenBodyDoesNotExist()
-    {
+    public function testGetParsedBodyWhenBodyDoesNotExist(): void {
         $request = $this->requestFactory();
         $prop = new ReflectionProperty($request, 'body');
         $prop->setAccessible(true);
@@ -1042,8 +960,7 @@ class RequestTest extends TestCase
         $this->assertNull($request->getParsedBody());
     }
 
-    public function testGetParsedBodyAfterCallReparseBody()
-    {
+    public function testGetParsedBodyAfterCallReparseBody(): void {
         $uri = Uri::createFromString('https://example.com:443/?one=1');
         $headers = new Headers([
             'Content-Type' => 'application/x-www-form-urlencoded;charset=utf8',
@@ -1069,8 +986,7 @@ class RequestTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testGetParsedBodyAsArray()
-    {
+    public function testGetParsedBodyAsArray(): void {
         $uri = Uri::createFromString('https://example.com:443/foo/bar?abc=123');
         $headers = new Headers([
             'Content-Type' => 'application/json;charset=utf8',
@@ -1087,15 +1003,13 @@ class RequestTest extends TestCase
         $request->getParsedBody(); // <-- Triggers exception
     }
 
-    public function testWithParsedBody()
-    {
+    public function testWithParsedBody(): void {
         $clone = $this->requestFactory()->withParsedBody(['xyz' => '123']);
 
         $this->assertEquals(['xyz' => '123'], $clone->getParsedBody());
     }
 
-    public function testWithParsedBodyEmptyArray()
-    {
+    public function testWithParsedBodyEmptyArray(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -1112,8 +1026,7 @@ class RequestTest extends TestCase
         $this->assertEquals([], $clone->getParsedBody());
     }
 
-    public function testWithParsedBodyNull()
-    {
+    public function testWithParsedBodyNull(): void {
         $method = 'GET';
         $uri = new Uri('https', 'example.com', 443, '/foo/bar', 'abc=123', '', '');
         $headers = new Headers();
@@ -1130,15 +1043,13 @@ class RequestTest extends TestCase
         $this->assertNull($clone->getParsedBody());
     }
 
-    public function testGetParsedBodyReturnsNullWhenThereIsNoBodyData()
-    {
+    public function testGetParsedBodyReturnsNullWhenThereIsNoBodyData(): void {
         $request = $this->requestFactory(['REQUEST_METHOD' => 'POST']);
 
         $this->assertNull($request->getParsedBody());
     }
 
-    public function testGetParsedBodyReturnsNullWhenThereIsNoMediaTypeParserRegistered()
-    {
+    public function testGetParsedBodyReturnsNullWhenThereIsNoMediaTypeParserRegistered(): void {
         $request = $this->requestFactory([
             'REQUEST_METHOD' => 'POST',
             'CONTENT_TYPE' => 'text/csv',
@@ -1151,21 +1062,18 @@ class RequestTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testWithParsedBodyInvalid()
-    {
+    public function testWithParsedBodyInvalid(): void {
         $this->requestFactory()->withParsedBody(2);
     }
 
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testWithParsedBodyInvalidFalseValue()
-    {
+    public function testWithParsedBodyInvalidFalseValue(): void {
         $this->requestFactory()->withParsedBody(false);
     }
 
-    public function testGetParameterFromBody()
-    {
+    public function testGetParameterFromBody(): void {
         $body = new RequestBody();
         $body->write('foo=bar');
         $body->rewind();
@@ -1176,8 +1084,7 @@ class RequestTest extends TestCase
         $this->assertEquals('bar', $request->getParam('foo'));
     }
 
-    public function testGetParameterFromBodyWithBodyParemeterHelper()
-    {
+    public function testGetParameterFromBodyWithBodyParemeterHelper(): void {
         $body = new RequestBody();
         $body->write('foo=bar');
         $body->rewind();
@@ -1188,22 +1095,19 @@ class RequestTest extends TestCase
         $this->assertEquals('bar', $request->getParsedBodyParam('foo'));
     }
 
-    public function testGetParameterFromQuery()
-    {
+    public function testGetParameterFromQuery(): void {
         $request = $this->requestFactory()->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         $this->assertEquals('123', $request->getParam('abc'));
     }
 
-    public function testGetParameterFromQueryWithQueryParemeterHelper()
-    {
+    public function testGetParameterFromQueryWithQueryParemeterHelper(): void {
         $request = $this->requestFactory()->withHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         $this->assertEquals('123', $request->getQueryParam('abc'));
     }
 
-    public function testGetParameterFromBodyOverQuery()
-    {
+    public function testGetParameterFromBodyOverQuery(): void {
         $body = new RequestBody();
         $body->write('abc=xyz');
         $body->rewind();
@@ -1213,8 +1117,7 @@ class RequestTest extends TestCase
         $this->assertEquals('xyz', $request->getParam('abc'));
     }
 
-    public function testGetParameterWithDefaultFromBodyOverQuery()
-    {
+    public function testGetParameterWithDefaultFromBodyOverQuery(): void {
         $body = new RequestBody();
         $body->write('abc=xyz');
         $body->rewind();
@@ -1225,8 +1128,7 @@ class RequestTest extends TestCase
         $this->assertEquals('bar', $request->getParam('foo', 'bar'));
     }
 
-    public function testGetParameters()
-    {
+    public function testGetParameters(): void {
         $body = new RequestBody();
         $body->write('foo=bar');
         $body->rewind();
@@ -1237,8 +1139,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['abc' => '123', 'foo' => 'bar'], $request->getParams());
     }
 
-    public function testGetParametersWithBodyPriority()
-    {
+    public function testGetParametersWithBodyPriority(): void {
         $body = new RequestBody();
         $body->write('foo=bar&abc=xyz');
         $body->rewind();
@@ -1249,8 +1150,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['abc' => 'xyz', 'foo' => 'bar'], $request->getParams());
     }
 
-    public function testGetParametersWithSpecificKeys()
-    {
+    public function testGetParametersWithSpecificKeys(): void {
         $body = new RequestBody();
         $body->write('foo=bar&abc=xyz');
         $body->rewind();
@@ -1261,8 +1161,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['abc' => 'xyz'], $request->getParams(['abc']));
     }
 
-    public function testGetParametersWithSpecificKeysAreMissingIfTheyDontExit()
-    {
+    public function testGetParametersWithSpecificKeysAreMissingIfTheyDontExit(): void {
         $body = new RequestBody();
         $body->write('foo=bar');
         $body->rewind();
@@ -1273,8 +1172,7 @@ class RequestTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $request->getParams(['foo', 'bar']));
     }
 
-    public function testGetProtocolVersion()
-    {
+    public function testGetProtocolVersion(): void {
         $env = Environment::mock(['SERVER_PROTOCOL' => 'HTTP/1.0']);
         $request = Request::createFromEnvironment($env);
 

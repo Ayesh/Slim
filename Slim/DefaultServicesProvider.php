@@ -29,15 +29,14 @@ class DefaultServicesProvider
      *
      * @param Container $container A DI container implementing ArrayAccess and psr/container.
      */
-    public function register($container)
-    {
+    public function register($container): void {
         if (!isset($container['environment'])) {
             /**
              * This service MUST return a shared instance of \Slim\Http\Environment.
              *
              * @return Environment
              */
-            $container['environment'] = function () {
+            $container['environment'] = static function () {
                 return new Environment($_SERVER);
             };
         }
@@ -50,7 +49,7 @@ class DefaultServicesProvider
              *
              * @return ServerRequestInterface
              */
-            $container['request'] = function ($container) {
+            $container['request'] = static function ($container) {
                 return Request::createFromEnvironment($container->get('environment'));
             };
         }
@@ -63,7 +62,7 @@ class DefaultServicesProvider
              *
              * @return ResponseInterface
              */
-            $container['response'] = function ($container) {
+            $container['response'] = static function ($container) {
                 $headers = new Headers(['Content-Type' => 'text/html; charset=UTF-8']);
                 $response = new Response(200, $headers);
 
@@ -79,7 +78,7 @@ class DefaultServicesProvider
              *
              * @return RouterInterface
              */
-            $container['router'] = function ($container) {
+            $container['router'] = static function ($container) {
                 $routerCacheFile = false;
                 if (isset($container->get('settings')['routerCacheFile'])) {
                     $routerCacheFile = $container->get('settings')['routerCacheFile'];
@@ -100,7 +99,7 @@ class DefaultServicesProvider
              *
              * @return InvocationStrategyInterface
              */
-            $container['foundHandler'] = function () {
+            $container['foundHandler'] = static function () {
                 return new RequestResponse;
             };
         }
@@ -119,7 +118,7 @@ class DefaultServicesProvider
              *
              * @return callable
              */
-            $container['phpErrorHandler'] = function ($container) {
+            $container['phpErrorHandler'] = static function ($container) {
                 return new PhpError($container->get('settings')['displayErrorDetails']);
             };
         }
@@ -138,7 +137,7 @@ class DefaultServicesProvider
              *
              * @return callable
              */
-            $container['errorHandler'] = function ($container) {
+            $container['errorHandler'] = static function ($container) {
                 return new Error(
                     $container->get('settings')['displayErrorDetails']
                 );
@@ -156,7 +155,7 @@ class DefaultServicesProvider
              *
              * @return callable
              */
-            $container['notFoundHandler'] = function () {
+            $container['notFoundHandler'] = static function () {
                 return new NotFound;
             };
         }
@@ -173,7 +172,7 @@ class DefaultServicesProvider
              *
              * @return callable
              */
-            $container['notAllowedHandler'] = function () {
+            $container['notAllowedHandler'] = static function () {
                 return new NotAllowed;
             };
         }
@@ -186,7 +185,7 @@ class DefaultServicesProvider
              *
              * @return CallableResolverInterface
              */
-            $container['callableResolver'] = function ($container) {
+            $container['callableResolver'] = static function ($container) {
                 return new CallableResolver($container);
             };
         }

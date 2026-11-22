@@ -26,77 +26,67 @@ class NonBufferedBody implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function close()
-    {
+    public function close(): void {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function detach()
-    {
+    public function detach(): void {
         return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSize()
-    {
+    public function getSize(): void {
         return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function tell()
-    {
+    public function tell(): int {
         return 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function eof()
-    {
+    public function eof(): bool {
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isSeekable()
-    {
+    public function isSeekable(): bool {
         return false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function seek($offset, $whence = SEEK_SET)
-    {
+    public function seek($offset, $whence = SEEK_SET): void {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rewind()
-    {
+    public function rewind(): void {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isWritable()
-    {
+    public function isWritable(): bool {
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write($string)
-    {
+    public function write($string): int {
         $buffered = '';
         while (0 < ob_get_level()) {
             $buffered = ob_get_clean() . $buffered;
@@ -112,32 +102,28 @@ class NonBufferedBody implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function isReadable()
-    {
+    public function isReadable(): bool {
         return false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read($length)
-    {
+    public function read($length): string {
         return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getContents()
-    {
+    public function getContents(): string {
         return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($key = null)
-    {
+    public function getMetadata($key = null): void {
         return null;
     }
 }

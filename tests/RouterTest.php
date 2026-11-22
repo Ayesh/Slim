@@ -14,6 +14,7 @@ use ReflectionClass;
 use RuntimeException;
 use Slim\Http\Uri;
 use Slim\Router;
+use Slim\Interfaces\RouteInterface;
 
 class RouterTest extends TestCase
 {
@@ -39,8 +40,7 @@ class RouterTest extends TestCase
         }
     }
 
-    public function testMap()
-    {
+    public function testMap(): void {
         $methods = ['GET'];
         $pattern = '/hello/{first}/{last}';
         $callable = function ($request, $response, $args) {
@@ -48,12 +48,11 @@ class RouterTest extends TestCase
         };
         $route = $this->router->map($methods, $pattern, $callable);
 
-        $this->assertInstanceOf('\Slim\Interfaces\RouteInterface', $route);
+        $this->assertInstanceOf(RouteInterface::class, $route);
         $this->assertAttributeContains($route, 'routes', $this->router);
     }
 
-    public function testMapPrependsGroupPattern()
-    {
+    public function testMapPrependsGroupPattern(): void {
         $methods = ['GET'];
         $pattern = '/hello/{first}/{last}';
         $callable = function ($request, $response, $args) {
@@ -72,8 +71,7 @@ class RouterTest extends TestCase
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage Route pattern must be a string
      */
-    public function testMapWithInvalidPatternType()
-    {
+    public function testMapWithInvalidPatternType(): void {
         $methods = ['GET'];
         $pattern = ['foo'];
         $callable = function ($request, $response, $args) {
@@ -82,8 +80,7 @@ class RouterTest extends TestCase
         $this->router->map($methods, $pattern, $callable);
     }
 
-    public function testRelativePathFor()
-    {
+    public function testRelativePathFor(): void {
         $this->router->setBasePath('/base/path');
 
         $methods = ['GET'];
@@ -100,14 +97,12 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testGetBasePath()
-    {
+    public function testGetBasePath(): void {
         $this->router->setBasePath('/new/base/path');
         $this->assertEquals('/new/base/path', $this->router->getBasePath());
     }
 
-    public function testPathForWithNoBasePath()
-    {
+    public function testPathForWithNoBasePath(): void {
         $this->router->setBasePath('');
 
         $methods = ['GET'];
@@ -124,8 +119,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPathForWithBasePath()
-    {
+    public function testPathForWithBasePath(): void {
         $methods = ['GET'];
         $pattern = '/hello/{first:\w+}/{last}';
         $callable = function ($request, $response, $args) {
@@ -141,8 +135,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPathForWithOptionalParameters()
-    {
+    public function testPathForWithOptionalParameters(): void {
         $methods = ['GET'];
         $pattern = '/archive/{year}[/{month:[\d:{2}]}[/d/{day}]]';
         $callable = function ($request, $response, $args) {
@@ -165,8 +158,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPathForWithQueryParameters()
-    {
+    public function testPathForWithQueryParameters(): void {
         $methods = ['GET'];
         $pattern = '/hello/{name}';
         $callable = function ($request, $response, $args) {
@@ -181,8 +173,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPathForWithNullQueryParameters()
-    {
+    public function testPathForWithNullQueryParameters(): void {
         $methods = ['GET'];
         $pattern = '/hello/{name}';
         $callable = function ($request, $response, $args) {
@@ -200,8 +191,7 @@ class RouterTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testPathForWithMissingSegmentData()
-    {
+    public function testPathForWithMissingSegmentData(): void {
         $methods = ['GET'];
         $pattern = '/hello/{first}/{last}';
         $callable = function ($request, $response, $args) {
@@ -216,8 +206,7 @@ class RouterTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testPathForRouteNotExists()
-    {
+    public function testPathForRouteNotExists(): void {
         $methods = ['GET'];
         $pattern = '/hello/{first}/{last}';
         $callable = function ($request, $response, $args) {
@@ -232,21 +221,18 @@ class RouterTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testSettingInvalidBasePath()
-    {
+    public function testSettingInvalidBasePath(): void {
         $this->router->setBasePath(['invalid']);
     }
 
-    public function testCreateDispatcher()
-    {
+    public function testCreateDispatcher(): void {
         $class = new ReflectionClass($this->router);
         $method = $class->getMethod('createDispatcher');
         $method->setAccessible(true);
         $this->assertInstanceOf('\FastRoute\Dispatcher', $method->invoke($this->router));
     }
 
-    public function testSetDispatcher()
-    {
+    public function testSetDispatcher(): void {
         $this->router->setDispatcher(\FastRoute\simpleDispatcher(function ($r) {
             $r->addRoute('GET', '/', function () {
             });
@@ -260,8 +246,7 @@ class RouterTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testRemoveRoute()
-    {
+    public function testRemoveRoute(): void {
         $methods = ['GET'];
         $callable = function ($request, $response, $args) {
             echo sprintf('Hello ignore me');
@@ -316,14 +301,12 @@ class RouterTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testRouteRemovalNotExists()
-    {
+    public function testRouteRemovalNotExists(): void {
         $this->router->setBasePath('/base/path');
         $this->router->removeNamedRoute('non-existing-route-name');
     }
 
-    public function testPathForWithModifiedRoutePattern()
-    {
+    public function testPathForWithModifiedRoutePattern(): void {
         $this->router->setBasePath('/base/path');
 
         $methods = ['GET'];
@@ -342,8 +325,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testSettingCacheFileToFalse()
-    {
+    public function testSettingCacheFileToFalse(): void {
         $this->router->setCacheFile(false);
 
         $class = new ReflectionClass($this->router);
@@ -353,42 +335,38 @@ class RouterTest extends TestCase
         $this->assertFalse($property->getValue($this->router));
     }
 
-    public function testSettingInvalidCacheFileValue()
-    {
+    public function testSettingInvalidCacheFileValue(): void {
         $this->setExpectedException(
-            '\InvalidArgumentException',
+            InvalidArgumentException::class,
             'Router cache file must be a string'
         );
         $this->router->setCacheFile(['invalid']);
     }
 
-    public function testCacheFileExistsAndIsNotReadable()
-    {
+    public function testCacheFileExistsAndIsNotReadable(): void {
         $this->cacheFile = __DIR__ . '/non-readable.cache';
         file_put_contents($this->cacheFile, '<?php return []; ?>');
 
         $this->setExpectedException(
-            '\RuntimeException',
+            RuntimeException::class,
             sprintf('Router cache file `%s` is not readable', $this->cacheFile)
         );
 
         $this->router->setCacheFile($this->cacheFile);
     }
 
-    public function testCacheFileDoesNotExistsAndDirectoryIsNotWritable()
-    {
+    public function testCacheFileDoesNotExistsAndDirectoryIsNotWritable(): void {
         $cacheFile = __DIR__ . '/non-writable-directory/router.cache';
 
         $this->setExpectedException(
-            '\RuntimeException',
+            RuntimeException::class,
             sprintf('Router cache file directory `%s` is not writable', dirname($cacheFile))
         );
 
         $this->router->setCacheFile($cacheFile);
     }
 
-    public function testRouteCacheFileCanBeDispatched()
-    {
+    public function testRouteCacheFileCanBeDispatched(): void {
         $methods = ['GET'];
         $pattern = '/hello/{first}/{last}';
         $callable = function ($request, $response, $args) {
@@ -396,7 +374,7 @@ class RouterTest extends TestCase
         };
         $route = $this->router->map($methods, $pattern, $callable)->setName('foo');
 
-        $cacheFile = dirname(__FILE__) . '/' . uniqid(microtime(true));
+        $cacheFile = __DIR__ . '/' . uniqid(microtime(true), true);
         $this->router->setCacheFile($cacheFile);
         $class = new ReflectionClass($this->router);
         $method = $class->getMethod('createDispatcher');
@@ -426,8 +404,7 @@ class RouterTest extends TestCase
      * Calling createDispatcher as second time should give you back the same
      * dispatcher as when you called it the first time.
      */
-    public function testCreateDispatcherReturnsSameDispatcherASecondTime()
-    {
+    public function testCreateDispatcherReturnsSameDispatcherASecondTime(): void {
         $class = new ReflectionClass($this->router);
         $method = $class->getMethod('createDispatcher');
         $method->setAccessible(true);
@@ -440,13 +417,11 @@ class RouterTest extends TestCase
     /**
      * @expectedException RuntimeException
      */
-    public function testLookupRouteThrowsExceptionIfRouteNotFound()
-    {
+    public function testLookupRouteThrowsExceptionIfRouteNotFound(): void {
         $this->router->lookupRoute("thisIsMissing");
     }
 
-    public function testFullUrlFor()
-    {
+    public function testFullUrlFor(): void {
         $methods = ['GET'];
         $pattern = '/token/{token}';
 

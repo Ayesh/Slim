@@ -62,8 +62,7 @@ class PhpError extends AbstractError
      *
      * @return string
      */
-    protected function renderHtmlErrorMessage(Throwable $error)
-    {
+    protected function renderHtmlErrorMessage(Throwable $error): string {
         $title = 'Slim Application Error';
 
         if ($this->displayErrorDetails) {
@@ -99,8 +98,7 @@ class PhpError extends AbstractError
      *
      * @return string
      */
-    protected function renderHtmlError(Throwable $error)
-    {
+    protected function renderHtmlError(Throwable $error): string {
         $html = sprintf('<div><strong>Type:</strong> %s</div>', get_class($error));
 
         if (($code = $error->getCode())) {
@@ -134,8 +132,7 @@ class PhpError extends AbstractError
      *
      * @return string
      */
-    protected function renderJsonErrorMessage(Throwable $error)
-    {
+    protected function renderJsonErrorMessage(Throwable $error): string {
         $json = [
             'message' => 'Slim Application Error',
         ];
@@ -165,8 +162,7 @@ class PhpError extends AbstractError
      *
      * @return string
      */
-    protected function renderXmlErrorMessage(Throwable $error)
-    {
+    protected function renderXmlErrorMessage(Throwable $error): string {
         $xml = "<error>\n  <message>Slim Application Error</message>\n";
         if ($this->displayErrorDetails) {
             do {
@@ -192,8 +188,7 @@ class PhpError extends AbstractError
      *
      * @return string
      */
-    private function createCdataSection($content)
-    {
+    private function createCdataSection($content): string {
         return sprintf('<![CDATA[%s]]>', str_replace(']]>', ']]]]><![CDATA[>', $content));
     }
 }

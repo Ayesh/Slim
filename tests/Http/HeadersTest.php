@@ -15,8 +15,7 @@ use Slim\Http\Headers;
 
 class HeadersTest extends TestCase
 {
-    public function testCreateFromEnvironment()
-    {
+    public function testCreateFromEnvironment(): void {
         $e = Environment::mock([
             'HTTP_ACCEPT' => 'application/json',
         ]);
@@ -28,8 +27,7 @@ class HeadersTest extends TestCase
         $this->assertEquals('application/json', $prop->getValue($h)['accept']['value'][0]);
     }
 
-    public function testCreateFromEnvironmentWithSpecialHeaders()
-    {
+    public function testCreateFromEnvironmentWithSpecialHeaders(): void {
         $e = Environment::mock([
             'CONTENT_TYPE' => 'application/json',
         ]);
@@ -41,8 +39,7 @@ class HeadersTest extends TestCase
         $this->assertEquals('application/json', $prop->getValue($h)['content-type']['value'][0]);
     }
 
-    public function testCreateFromEnvironmentIgnoresHeaders()
-    {
+    public function testCreateFromEnvironmentIgnoresHeaders(): void {
         $e = Environment::mock([
             'CONTENT_TYPE' => 'text/csv',
             'HTTP_CONTENT_LENGTH' => 1230, // <-- Ignored
@@ -54,8 +51,7 @@ class HeadersTest extends TestCase
         $this->assertNotContains('content-length', $prop->getValue($h));
     }
 
-    public function testConstructor()
-    {
+    public function testConstructor(): void {
         $h = new Headers([
             'Content-Length' => 100,
         ]);
@@ -66,8 +62,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(100, $prop->getValue($h)['content-length']['value'][0]);
     }
 
-    public function testSetSingleValue()
-    {
+    public function testSetSingleValue(): void {
         $h = new Headers();
         $h->set('Content-Length', 100);
         $prop = new ReflectionProperty($h, 'data');
@@ -77,8 +72,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(100, $prop->getValue($h)['content-length']['value'][0]);
     }
 
-    public function testSetArrayValue()
-    {
+    public function testSetArrayValue(): void {
         $h = new Headers();
         $h->set('Allow', ['GET', 'POST']);
         $prop = new ReflectionProperty($h, 'data');
@@ -88,8 +82,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(['GET', 'POST'], $prop->getValue($h)['allow']['value']);
     }
 
-    public function testGet()
-    {
+    public function testGet(): void {
         $h = new Headers();
         $prop = new ReflectionProperty($h, 'data');
         $prop->setAccessible(true);
@@ -103,8 +96,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(['GET', 'POST'], $h->get('Allow'));
     }
 
-    public function testGetOriginalKey()
-    {
+    public function testGetOriginalKey(): void {
         $h = new Headers();
         $h->set('http-test_key', 'testValue');
         $h->get('test-key');
@@ -116,15 +108,13 @@ class HeadersTest extends TestCase
         $this->assertNull($h->getOriginalKey('test-non-existing'));
     }
 
-    public function testGetNotExists()
-    {
+    public function testGetNotExists(): void {
         $h = new Headers();
 
         $this->assertNull($h->get('Foo'));
     }
 
-    public function testAddNewValue()
-    {
+    public function testAddNewValue(): void {
         $h = new Headers();
         $h->add('Foo', 'Bar');
         $prop = new ReflectionProperty($h, 'data');
@@ -134,8 +124,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(['Bar'], $prop->getValue($h)['foo']['value']);
     }
 
-    public function testAddAnotherValue()
-    {
+    public function testAddAnotherValue(): void {
         $h = new Headers();
         $h->add('Foo', 'Bar');
         $h->add('Foo', 'Xyz');
@@ -146,8 +135,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(['Bar', 'Xyz'], $prop->getValue($h)['foo']['value']);
     }
 
-    public function testAddArrayValue()
-    {
+    public function testAddArrayValue(): void {
         $h = new Headers();
         $h->add('Foo', 'Bar');
         $h->add('Foo', ['Xyz', '123']);
@@ -158,8 +146,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(['Bar', 'Xyz', '123'], $prop->getValue($h)['foo']['value']);
     }
 
-    public function testHas()
-    {
+    public function testHas(): void {
         $h = new Headers();
         $prop = new ReflectionProperty($h, 'data');
         $prop->setAccessible(true);
@@ -173,8 +160,7 @@ class HeadersTest extends TestCase
         $this->assertFalse($h->has('foo'));
     }
 
-    public function testRemove()
-    {
+    public function testRemove(): void {
         $h = new Headers();
         $prop = new ReflectionProperty($h, 'data');
         $prop->setAccessible(true);
@@ -189,8 +175,7 @@ class HeadersTest extends TestCase
         $this->assertNotContains('Allow', $prop->getValue($h));
     }
 
-    public function testOriginalKeys()
-    {
+    public function testOriginalKeys(): void {
         $h = new Headers();
         $prop = new ReflectionProperty($h, 'data');
         $prop->setAccessible(true);
@@ -205,8 +190,7 @@ class HeadersTest extends TestCase
         $this->assertArrayHasKey('ALLOW', $all);
     }
 
-    public function testNormalizeKey()
-    {
+    public function testNormalizeKey(): void {
         $h = new Headers();
         $this->assertEquals('foo-bar', $h->normalizeKey('HTTP_FOO_BAR'));
         $this->assertEquals('foo-bar', $h->normalizeKey('HTTP-FOO-BAR'));
@@ -216,8 +200,7 @@ class HeadersTest extends TestCase
         $this->assertEquals('foo-bar', $h->normalizeKey('http-foo-bar'));
     }
 
-    public function testDetermineAuthorization()
-    {
+    public function testDetermineAuthorization(): void {
         $e = Environment::mock([]);
         $en = Headers::determineAuthorization($e);
         $h = Headers::createFromEnvironment($e);
@@ -226,8 +209,7 @@ class HeadersTest extends TestCase
         $this->assertEquals(['electrolytes'], $h->get('Authorization'));
     }
 
-    public function testDetermineAuthorizationReturnsEarlyIfHeadersIsNotArray()
-    {
+    public function testDetermineAuthorizationReturnsEarlyIfHeadersIsNotArray(): void {
         $e = Environment::mock([]);
 
         $GLOBALS['getallheaders_return'] = false;

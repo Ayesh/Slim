@@ -47,7 +47,8 @@ class CallableResolverTest extends TestCase
         {
             static $called_count = 0;
             return $called_count++;
-        };
+        }
+
         // @codingStandardsIgnoreEnd
 
         $resolver = new CallableResolver($this->container);
@@ -91,7 +92,7 @@ class CallableResolverTest extends TestCase
 
     public function testResolutionToAnInvokableClassInContainer(): void
     {
-        $this->container['an_invokable'] = function ($c) {
+        $this->container['an_invokable'] = static function ($c) {
             return new InvokableTest();
         };
         $resolver = new CallableResolver($this->container);
@@ -100,10 +101,9 @@ class CallableResolverTest extends TestCase
         $this->assertEquals(1, InvokableTest::$CalledCount);
     }
 
-    public function testResolutionToAnInvokableClass()
-    {
+    public function testResolutionToAnInvokableClass(): void {
         $resolver = new CallableResolver($this->container);
-        $callable = $resolver->resolve('Slim\Tests\Mocks\InvokableTest');
+        $callable = $resolver->resolve(InvokableTest::class);
         $callable();
         $this->assertEquals(1, InvokableTest::$CalledCount);
     }

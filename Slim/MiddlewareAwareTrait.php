@@ -50,8 +50,7 @@ trait MiddlewareAwareTrait
      * @throws RuntimeException         If middleware is added while the stack is dequeuing
      * @throws UnexpectedValueException If the middleware doesn't return a Psr\Http\Message\ResponseInterface
      */
-    protected function addMiddleware(callable $callable)
-    {
+    protected function addMiddleware(callable $callable): static {
         if ($this->middlewareLock) {
             throw new RuntimeException('Middleware can’t be added once the stack is dequeuing');
         }
@@ -60,7 +59,7 @@ trait MiddlewareAwareTrait
             $this->seedMiddlewareStack();
         }
         $next = $this->tip;
-        $this->tip = function (
+        $this->tip = static function (
             ServerRequestInterface $request,
             ResponseInterface $response
         ) use (
@@ -87,8 +86,7 @@ trait MiddlewareAwareTrait
      *
      * @throws RuntimeException if the stack is seeded more than once
      */
-    protected function seedMiddlewareStack(?callable $kernel = null)
-    {
+    protected function seedMiddlewareStack(?callable $kernel = null): void {
         if (!is_null($this->tip)) {
             throw new RuntimeException('MiddlewareStack can only be seeded once.');
         }
@@ -106,8 +104,7 @@ trait MiddlewareAwareTrait
      *
      * @return ResponseInterface
      */
-    public function callMiddlewareStack(ServerRequestInterface $request, ResponseInterface $response)
-    {
+    public function callMiddlewareStack(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
         if (is_null($this->tip)) {
             $this->seedMiddlewareStack();
         }

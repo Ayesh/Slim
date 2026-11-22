@@ -10,6 +10,7 @@ namespace Slim\Tests\Http;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_TestCase;
 use Slim\Http\Environment;
+use Slim\Interfaces\CollectionInterface;
 
 class EnvironmentTest extends TestCase
 {
@@ -34,8 +35,7 @@ class EnvironmentTest extends TestCase
     /**
      * Test environment from globals
      */
-    public function testEnvironmentFromGlobals()
-    {
+    public function testEnvironmentFromGlobals(): void {
         $env = new Environment($_SERVER);
 
         $this->assertEquals($_SERVER, $env->all());
@@ -44,14 +44,13 @@ class EnvironmentTest extends TestCase
     /**
      * Test environment from mock data
      */
-    public function testMock()
-    {
+    public function testMock(): void {
         $env = Environment::mock([
             'SCRIPT_NAME' => '/foo/bar/index.php',
             'REQUEST_URI' => '/foo/bar?abc=123',
         ]);
 
-        $this->assertInstanceOf('\Slim\Interfaces\CollectionInterface', $env);
+        $this->assertInstanceOf(CollectionInterface::class, $env);
         $this->assertEquals('/foo/bar/index.php', $env->get('SCRIPT_NAME'));
         $this->assertEquals('/foo/bar?abc=123', $env->get('REQUEST_URI'));
         $this->assertEquals('localhost', $env->get('HTTP_HOST'));
@@ -60,13 +59,12 @@ class EnvironmentTest extends TestCase
     /**
      * Test environment from mock data with HTTPS
      */
-    public function testMockHttps()
-    {
+    public function testMockHttps(): void {
         $env = Environment::mock([
             'HTTPS' => 'on'
         ]);
 
-        $this->assertInstanceOf('\Slim\Interfaces\CollectionInterface', $env);
+        $this->assertInstanceOf(CollectionInterface::class, $env);
         $this->assertEquals('on', $env->get('HTTPS'));
         $this->assertEquals(443, $env->get('SERVER_PORT'));
     }
@@ -74,13 +72,12 @@ class EnvironmentTest extends TestCase
     /**
      * Test environment from mock data with REQUEST_SCHEME
      */
-    public function testMockRequestScheme()
-    {
+    public function testMockRequestScheme(): void {
         $env = Environment::mock([
             'REQUEST_SCHEME' => 'https'
         ]);
 
-        $this->assertInstanceOf('\Slim\Interfaces\CollectionInterface', $env);
+        $this->assertInstanceOf(CollectionInterface::class, $env);
         $this->assertEquals('https', $env->get('REQUEST_SCHEME'));
         $this->assertEquals(443, $env->get('SERVER_PORT'));
     }

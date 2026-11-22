@@ -131,8 +131,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public static function createFromEnvironment(Environment $environment)
-    {
+    public static function createFromEnvironment(Environment $environment): static {
         $method = $environment['REQUEST_METHOD'];
         $uri = Uri::createFromEnvironment($environment);
         $headers = Headers::createFromEnvironment($environment);
@@ -283,8 +282,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string
      */
-    public function getOriginalMethod()
-    {
+    public function getOriginalMethod(): ?string {
         return $this->originalMethod;
     }
 
@@ -305,8 +303,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @throws InvalidArgumentException for invalid HTTP methods.
      */
-    public function withMethod($method)
-    {
+    public function withMethod($method): static {
         $method = $this->filterMethod($method);
         $clone = clone $this;
         $clone->originalMethod = $method;
@@ -324,8 +321,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @throws InvalidArgumentException on invalid HTTP method.
      */
-    protected function filterMethod($method)
-    {
+    protected function filterMethod($method): ?string {
         if ($method === null) {
             return $method;
         }
@@ -333,7 +329,7 @@ class Request extends Message implements ServerRequestInterface
         if (!is_string($method)) {
             throw new InvalidArgumentException(sprintf(
                 'Unsupported HTTP method; must be a string, received %s',
-                (is_object($method) ? get_class($method) : gettype($method))
+                (get_debug_type($method))
             ));
         }
 
@@ -354,8 +350,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isMethod($method)
-    {
+    public function isMethod($method): bool {
         return $this->getMethod() === $method;
     }
 
@@ -366,8 +361,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isGet()
-    {
+    public function isGet(): bool {
         return $this->isMethod('GET');
     }
 
@@ -378,8 +372,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isPost()
-    {
+    public function isPost(): bool {
         return $this->isMethod('POST');
     }
 
@@ -390,8 +383,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isPut()
-    {
+    public function isPut(): bool {
         return $this->isMethod('PUT');
     }
 
@@ -402,8 +394,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isPatch()
-    {
+    public function isPatch(): bool {
         return $this->isMethod('PATCH');
     }
 
@@ -414,8 +405,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isDelete()
-    {
+    public function isDelete(): bool {
         return $this->isMethod('DELETE');
     }
 
@@ -426,8 +416,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isHead()
-    {
+    public function isHead(): bool {
         return $this->isMethod('HEAD');
     }
 
@@ -438,8 +427,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isOptions()
-    {
+    public function isOptions(): bool {
         return $this->isMethod('OPTIONS');
     }
 
@@ -450,8 +438,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return bool
      */
-    public function isXhr()
-    {
+    public function isXhr(): bool {
         return $this->getHeaderLine('X-Requested-With') === 'XMLHttpRequest';
     }
 
@@ -471,8 +458,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string
      */
-    public function getRequestTarget()
-    {
+    public function getRequestTarget(): string {
         if ($this->requestTarget) {
             return $this->requestTarget;
         }
@@ -519,8 +505,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @throws InvalidArgumentException if the request target is invalid
      */
-    public function withRequestTarget($requestTarget)
-    {
+    public function withRequestTarget($requestTarget): static {
         if (preg_match('#\s#', $requestTarget)) {
             throw new InvalidArgumentException(
                 'Invalid request target provided; must be a string and cannot contain whitespace'
@@ -541,8 +526,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return UriInterface
      */
-    public function getUri()
-    {
+    public function getUri(): UriInterface {
         return $this->uri;
     }
 
@@ -578,8 +562,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withUri(UriInterface $uri, $preserveHost = false)
-    {
+    public function withUri(UriInterface $uri, $preserveHost = false): static {
         $clone = clone $this;
         $clone->uri = $uri;
 
@@ -587,10 +570,8 @@ class Request extends Message implements ServerRequestInterface
             if ($uri->getHost() !== '') {
                 $clone->headers->set('Host', $uri->getHost());
             }
-        } else {
-            if ($uri->getHost() !== '' && (!$this->hasHeader('Host') || $this->getHeaderLine('Host') === '')) {
-                $clone->headers->set('Host', $uri->getHost());
-            }
+        } elseif ($uri->getHost() !== '' && (!$this->hasHeader('Host') || $this->getHeaderLine('Host') === '')) {
+            $clone->headers->set('Host', $uri->getHost());
         }
 
         return $clone;
@@ -603,8 +584,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string|null
      */
-    public function getContentType()
-    {
+    public function getContentType(): ?string {
         $result = $this->getHeader('Content-Type');
 
         return $result ? $result[0] : null;
@@ -636,8 +616,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string[]
      */
-    public function getMediaTypeParams()
-    {
+    public function getMediaTypeParams(): array {
         $contentType = $this->getContentType();
         $contentTypeParams = [];
         if ($contentType) {
@@ -659,8 +638,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return string|null
      */
-    public function getContentCharset()
-    {
+    public function getContentCharset(): ?string {
         $mediaTypeParams = $this->getMediaTypeParams();
         if (isset($mediaTypeParams['charset'])) {
             return $mediaTypeParams['charset'];
@@ -676,8 +654,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return int|null
      */
-    public function getContentLength()
-    {
+    public function getContentLength(): ?int {
         $result = $this->headers->get('Content-Length');
 
         return $result ? (int)$result[0] : null;
@@ -692,8 +669,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return array
      */
-    public function getCookieParams()
-    {
+    public function getCookieParams(): array {
         return $this->cookies;
     }
 
@@ -736,8 +712,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withCookieParams(array $cookies)
-    {
+    public function withCookieParams(array $cookies): static {
         $clone = clone $this;
         $clone->cookies = $cookies;
 
@@ -756,8 +731,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return array
      */
-    public function getQueryParams()
-    {
+    public function getQueryParams(): array {
         if (is_array($this->queryParams)) {
             return $this->queryParams;
         }
@@ -794,8 +768,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withQueryParams(array $query)
-    {
+    public function withQueryParams(array $query): static {
         $clone = clone $this;
         $clone->queryParams = $query;
 
@@ -813,8 +786,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return array
      */
-    public function getUploadedFiles()
-    {
+    public function getUploadedFiles(): array {
         return $this->uploadedFiles;
     }
 
@@ -831,8 +803,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @throws InvalidArgumentException if an invalid structure is provided.
      */
-    public function withUploadedFiles(array $uploadedFiles)
-    {
+    public function withUploadedFiles(array $uploadedFiles): static {
         $clone = clone $this;
         $clone->uploadedFiles = $uploadedFiles;
 
@@ -848,8 +819,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return array
      */
-    public function getServerParams()
-    {
+    public function getServerParams(): array {
         return $this->serverParams;
     }
 
@@ -881,8 +851,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return array
      */
-    public function getAttributes()
-    {
+    public function getAttributes(): array {
         return $this->attributes->all();
     }
 
@@ -925,8 +894,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttribute($name, $value)
-    {
+    public function withAttribute($name, $value): static {
         $clone = clone $this;
         $clone->attributes->set($name, $value);
 
@@ -949,8 +917,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withAttributes(array $attributes)
-    {
+    public function withAttributes(array $attributes): static {
         $clone = clone $this;
         $clone->attributes = new Collection($attributes);
 
@@ -973,8 +940,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return static
      */
-    public function withoutAttribute($name)
-    {
+    public function withoutAttribute($name): static {
         $clone = clone $this;
         $clone->attributes->remove($name);
 
@@ -1063,8 +1029,7 @@ class Request extends Message implements ServerRequestInterface
      * @throws InvalidArgumentException if an unsupported argument type is
      *     provided.
      */
-    public function withParsedBody($data)
-    {
+    public function withParsedBody($data): static {
         if (!is_null($data) && !is_object($data) && !is_array($data)) {
             throw new InvalidArgumentException('Parsed body value must be an array, an object, or null');
         }
@@ -1082,8 +1047,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return $this
      */
-    public function reparseBody()
-    {
+    public function reparseBody(): self {
         $this->bodyParsed = false;
 
         return $this;
@@ -1097,8 +1061,7 @@ class Request extends Message implements ServerRequestInterface
      * @param string   $mediaType A HTTP media type (excluding content-type params).
      * @param callable $callable  A callable that returns parsed contents for media type.
      */
-    public function registerMediaTypeParser($mediaType, callable $callable)
-    {
+    public function registerMediaTypeParser($mediaType, callable $callable): void {
         if ($callable instanceof Closure) {
             $callable = $callable->bindTo($this);
         }
@@ -1184,8 +1147,7 @@ class Request extends Message implements ServerRequestInterface
      *
      * @return mixed[]
      */
-    public function getParams(?array $only = null)
-    {
+    public function getParams(?array $only = null): array {
         $params = $this->getQueryParams();
         $postParams = $this->getParsedBody();
         if ($postParams) {

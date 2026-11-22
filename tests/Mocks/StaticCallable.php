@@ -12,8 +12,7 @@ use Slim\Http\Response;
 
 class StaticCallable
 {
-    public static function run(ServerRequestInterface $request, Response $response, $next)
-    {
+    public static function run(ServerRequestInterface $request, Response $response, $next): Response {
         $response->write('In1');
 
         /** @var Response $response */

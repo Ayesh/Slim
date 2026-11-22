@@ -69,8 +69,7 @@ class Container extends \PHPWatch\SimpleContainer\Container
      *
      * @return void
      */
-    private function registerDefaultServices($userSettings)
-    {
+    private function registerDefaultServices($userSettings): void {
         $defaultSettings = $this->defaultSettings;
 
         /**
@@ -78,7 +77,7 @@ class Container extends \PHPWatch\SimpleContainer\Container
          *
          * @return array|ArrayAccess
          */
-        $this['settings'] = function () use ($userSettings, $defaultSettings) {
+        $this['settings'] = static function () use ($userSettings, $defaultSettings) {
             return new Collection(array_merge($defaultSettings, $userSettings));
         };
 
@@ -127,8 +126,7 @@ class Container extends \PHPWatch\SimpleContainer\Container
      *
      * @return bool
      */
-    private function exceptionThrownByContainer(InvalidArgumentException $exception)
-    {
+    private function exceptionThrownByContainer(InvalidArgumentException $exception): bool {
         $trace = $exception->getTrace()[0];
 
         return $trace['class'] === \PHPWatch\SimpleContainer\Container::class && $trace['function'] === 'offsetGet';

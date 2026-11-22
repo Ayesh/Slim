@@ -132,8 +132,7 @@ class Uri implements UriInterface
      *
      * @return self
      */
-    public static function createFromString($uri)
-    {
+    public static function createFromString($uri): self {
         if (!is_string($uri) && !method_exists($uri, '__toString')) {
             throw new InvalidArgumentException('Uri must be a string');
         }
@@ -158,8 +157,7 @@ class Uri implements UriInterface
      *
      * @return self
      */
-    public static function createFromEnvironment(Environment $env)
-    {
+    public static function createFromEnvironment(Environment $env): self {
         // Scheme
         $isSecure = $env->get('HTTPS');
         $scheme = (empty($isSecure) || $isSecure === 'off') ? 'http' : 'https';
@@ -246,8 +244,7 @@ class Uri implements UriInterface
      *
      * @return string The URI scheme.
      */
-    public function getScheme()
-    {
+    public function getScheme(): string {
         return $this->scheme;
     }
 
@@ -268,8 +265,7 @@ class Uri implements UriInterface
      *
      * @throws InvalidArgumentException for invalid or unsupported schemes.
      */
-    public function withScheme($scheme)
-    {
+    public function withScheme($scheme): self {
         $scheme = $this->filterScheme($scheme);
         $clone = clone $this;
         $clone->scheme = $scheme;
@@ -286,8 +282,7 @@ class Uri implements UriInterface
      * @throws InvalidArgumentException If the Uri scheme is not a string.
      * @throws InvalidArgumentException If Uri scheme is not "", "https", or "http".
      */
-    protected function filterScheme($scheme)
-    {
+    protected function filterScheme($scheme): string {
         static $valid = [
             '' => true,
             'https' => true,
@@ -325,8 +320,7 @@ class Uri implements UriInterface
      *
      * @return string The URI authority, in "[user-info@]host[:port]" format.
      */
-    public function getAuthority()
-    {
+    public function getAuthority(): string {
         $userInfo = $this->getUserInfo();
         $host = $this->getHost();
         $port = $this->getPort();
@@ -349,8 +343,7 @@ class Uri implements UriInterface
      *
      * @return string The URI user information, in "username[:password]" format.
      */
-    public function getUserInfo()
-    {
+    public function getUserInfo(): string {
         return $this->user . ($this->password !== '' ? ':' . $this->password : '');
     }
 
@@ -369,8 +362,7 @@ class Uri implements UriInterface
      *
      * @return self A new instance with the specified user information.
      */
-    public function withUserInfo($user, $password = null)
-    {
+    public function withUserInfo($user, $password = null): self {
         $clone = clone $this;
         $clone->user = $this->filterUserInfo($user);
         if ('' !== $clone->user) {
@@ -389,11 +381,10 @@ class Uri implements UriInterface
      *
      * @return string The percent-encoded query string.
      */
-    protected function filterUserInfo($query)
-    {
+    protected function filterUserInfo($query): string {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=]+|%(?![A-Fa-f0-9]{2}))/u',
-            function ($match) {
+            static function ($match) {
                 return rawurlencode($match[0]);
             },
             $query
@@ -412,8 +403,7 @@ class Uri implements UriInterface
      *
      * @return string The URI host.
      */
-    public function getHost()
-    {
+    public function getHost(): string {
         return $this->host;
     }
 
@@ -429,8 +419,7 @@ class Uri implements UriInterface
      *
      * @return self A new instance with the specified host.
      */
-    public function withHost($host)
-    {
+    public function withHost($host): self {
         $clone = clone $this;
         $clone->host = $host;
 
@@ -452,8 +441,7 @@ class Uri implements UriInterface
      *
      * @return null|int The URI port.
      */
-    public function getPort()
-    {
+    public function getPort(): ?int {
         return $this->port && !$this->hasStandardPort() ? $this->port : null;
     }
 
@@ -474,8 +462,7 @@ class Uri implements UriInterface
      *
      * @return self A new instance with the specified port.
      */
-    public function withPort($port)
-    {
+    public function withPort($port): self {
         $port = $this->filterPort($port);
         $clone = clone $this;
         $clone->port = $port;
@@ -488,8 +475,7 @@ class Uri implements UriInterface
      *
      * @return bool
      */
-    protected function hasStandardPort()
-    {
+    protected function hasStandardPort(): bool {
         return ($this->scheme === 'http' && $this->port === 80) || ($this->scheme === 'https' && $this->port === 443);
     }
 
@@ -501,9 +487,8 @@ class Uri implements UriInterface
      *
      * @throws InvalidArgumentException If the port is invalid.
      */
-    protected function filterPort($port)
-    {
-        if (is_null($port) || (is_integer($port) && ($port >= 1 && $port <= 65535))) {
+    protected function filterPort($port): ?int {
+        if (is_null($port) || (is_int($port) && ($port >= 1 && $port <= 65535))) {
             return $port;
         }
 
@@ -536,8 +521,7 @@ class Uri implements UriInterface
      *
      * @return string The URI path.
      */
-    public function getPath()
-    {
+    public function getPath(): string {
         return $this->path;
     }
 
@@ -564,8 +548,7 @@ class Uri implements UriInterface
      *
      * @throws InvalidArgumentException For invalid paths.
      */
-    public function withPath($path)
-    {
+    public function withPath($path): Uri {
         if (!is_string($path)) {
             throw new InvalidArgumentException('Uri path must be a string');
         }
@@ -574,7 +557,7 @@ class Uri implements UriInterface
         $clone->path = $this->filterPath($path);
 
         // if the path is absolute, then clear basePath
-        if (substr($path, 0, 1) == '/') {
+        if ($path[0] == '/') {
             $clone->basePath = '';
         }
 
@@ -591,8 +574,7 @@ class Uri implements UriInterface
      *
      * @return string The base path segment of the URI.
      */
-    public function getBasePath()
-    {
+    public function getBasePath(): string {
         return $this->basePath;
     }
 
@@ -605,8 +587,7 @@ class Uri implements UriInterface
      *
      * @return static
      */
-    public function withBasePath($basePath)
-    {
+    public function withBasePath($basePath): static {
         if (!is_string($basePath)) {
             throw new InvalidArgumentException('Uri path must be a string');
         }
@@ -638,11 +619,10 @@ class Uri implements UriInterface
      *
      * @link   http://www.faqs.org/rfcs/rfc3986.html
      */
-    protected function filterPath($path)
-    {
+    protected function filterPath($path): string {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~:@&=\+\$,\/;%]+|%(?![A-Fa-f0-9]{2}))/',
-            function ($match) {
+            static function ($match) {
                 return rawurlencode($match[0]);
             },
             $path
@@ -670,8 +650,7 @@ class Uri implements UriInterface
      *
      * @return string
      */
-    public function getQuery()
-    {
+    public function getQuery(): string {
         return $this->query;
     }
 
@@ -692,8 +671,7 @@ class Uri implements UriInterface
      *
      * @throws InvalidArgumentException For invalid query strings.
      */
-    public function withQuery($query)
-    {
+    public function withQuery($query): self {
         if (!is_string($query) && !method_exists($query, '__toString')) {
             throw new InvalidArgumentException('Uri query must be a string');
         }
@@ -711,11 +689,10 @@ class Uri implements UriInterface
      *
      * @return string The percent-encoded query string.
      */
-    protected function filterQuery(string $query)
-    {
+    protected function filterQuery(string $query): string {
         return preg_replace_callback(
             '/(?:[^a-zA-Z0-9_\-\.~!\$&\'\(\)\*\+,;=%:@\/\?]+|%(?![A-Fa-f0-9]{2}))/',
-            function ($match) {
+            static function ($match) {
                 return rawurlencode($match[0]);
             },
             $query
@@ -739,8 +716,7 @@ class Uri implements UriInterface
      *
      * @return string The URI fragment.
      */
-    public function getFragment()
-    {
+    public function getFragment(): string {
         return $this->fragment;
     }
 
@@ -759,8 +735,7 @@ class Uri implements UriInterface
      *
      * @return static A new instance with the specified fragment.
      */
-    public function withFragment($fragment)
-    {
+    public function withFragment($fragment): Uri {
         if (!is_string($fragment) && !method_exists($fragment, '__toString')) {
             throw new InvalidArgumentException('Uri fragment must be a string');
         }
@@ -822,14 +797,13 @@ class Uri implements UriInterface
      *
      * @return string
      */
-    public function getBaseUrl()
-    {
+    public function getBaseUrl(): string {
         $scheme = $this->getScheme();
         $authority = $this->getAuthority();
         $basePath = $this->getBasePath();
 
-        if ($authority !== '' && substr($basePath, 0, 1) !== '/') {
-            $basePath = $basePath . '/' . $basePath;
+        if ($authority !== '' && $basePath[0] !== '/') {
+            $basePath .= '/' . $basePath;
         }
 
         return ($scheme !== '' ? $scheme . ':' : '')

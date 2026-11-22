@@ -73,8 +73,7 @@ class Collection implements CollectionInterface
      *
      * @return array The collection's source data keys
      */
-    public function keys()
-    {
+    public function keys(): array {
         return array_keys($this->data);
     }
 

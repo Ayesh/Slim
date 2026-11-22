@@ -61,8 +61,7 @@ class NotFound extends AbstractHandler
      *
      * @return string
      */
-    protected function renderPlainNotFoundOutput()
-    {
+    protected function renderPlainNotFoundOutput(): string {
         return 'Not found';
     }
 
@@ -71,8 +70,7 @@ class NotFound extends AbstractHandler
      *
      * @return string
      */
-    protected function renderJsonNotFoundOutput()
-    {
+    protected function renderJsonNotFoundOutput(): string {
         return '{"message":"Not found"}';
     }
 
@@ -81,8 +79,7 @@ class NotFound extends AbstractHandler
      *
      * @return string
      */
-    protected function renderXmlNotFoundOutput()
-    {
+    protected function renderXmlNotFoundOutput(): string {
         return '<root><message>Not found</message></root>';
     }
 
@@ -93,8 +90,7 @@ class NotFound extends AbstractHandler
      *
      * @return string
      */
-    protected function renderHtmlNotFoundOutput(ServerRequestInterface $request)
-    {
+    protected function renderHtmlNotFoundOutput(ServerRequestInterface $request): string {
         $homeUrl = (string)($request->getUri()->withPath('')->withQuery('')->withFragment(''));
         return <<<END
 <html>
