@@ -15,6 +15,13 @@ class RouteGroup extends Routable implements RouteGroupInterface
     /**
      * {@inheritdoc}
      */
+    public function add($callable): static {
+        return parent::add($callable);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function __invoke(?App $app = null)
     {
         $callable = $this->resolveCallable($this->callable);

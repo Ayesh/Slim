@@ -107,6 +107,13 @@ class Route extends Routable implements RouteInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function add($callable): static {
+        return parent::add($callable);
+    }
+
+    /**
      * Get route callable
      *
      * @return callable

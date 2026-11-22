@@ -9,6 +9,7 @@ namespace Slim\Http;
 
 use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
+use Stringable;
 
 /**
  * Value object representing a URI.
@@ -133,7 +134,7 @@ class Uri implements UriInterface
      * @return self
      */
     public static function createFromString($uri): self {
-        if (!is_string($uri) && !method_exists($uri, '__toString')) {
+        if (!is_string($uri) && !$uri instanceof Stringable) {
             throw new InvalidArgumentException('Uri must be a string');
         }
 
@@ -289,7 +290,7 @@ class Uri implements UriInterface
             'http' => true,
         ];
 
-        if (!is_string($scheme) && !method_exists($scheme, '__toString')) {
+        if (!is_string($scheme) && !$scheme instanceof Stringable) {
             throw new InvalidArgumentException('Uri scheme must be a string');
         }
 
@@ -557,7 +558,7 @@ class Uri implements UriInterface
         $clone->path = $this->filterPath($path);
 
         // if the path is absolute, then clear basePath
-        if ($path[0] == '/') {
+        if (str_starts_with($path, '/')) {
             $clone->basePath = '';
         }
 
@@ -672,7 +673,7 @@ class Uri implements UriInterface
      * @throws InvalidArgumentException For invalid query strings.
      */
     public function withQuery($query): self {
-        if (!is_string($query) && !method_exists($query, '__toString')) {
+        if (!is_string($query) && !$query instanceof Stringable) {
             throw new InvalidArgumentException('Uri query must be a string');
         }
         $query = ltrim((string)$query, '?');
@@ -736,7 +737,7 @@ class Uri implements UriInterface
      * @return static A new instance with the specified fragment.
      */
     public function withFragment($fragment): Uri {
-        if (!is_string($fragment) && !method_exists($fragment, '__toString')) {
+        if (!is_string($fragment) && !$fragment instanceof Stringable) {
             throw new InvalidArgumentException('Uri fragment must be a string');
         }
         $fragment = ltrim((string)$fragment, '#');
@@ -802,7 +803,7 @@ class Uri implements UriInterface
         $authority = $this->getAuthority();
         $basePath = $this->getBasePath();
 
-        if ($authority !== '' && $basePath[0] !== '/') {
+        if ($authority !== '' && !str_starts_with($basePath, '/')) {
             $basePath .= '/' . $basePath;
         }
 

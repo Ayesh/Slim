@@ -27,13 +27,11 @@ class CollectionTest extends TestCase
     {
         $this->bag = new Collection();
         $this->property = new ReflectionProperty($this->bag, 'data');
-        $this->property->setAccessible(true);
     }
 
     public function testInitializeWithData(): void {
         $bag = new Collection(['foo' => 'bar']);
         $bagProperty = new ReflectionProperty($bag, 'data');
-        $bagProperty->setAccessible(true);
 
         $this->assertEquals(['foo' => 'bar'], $bagProperty->getValue($bag));
     }

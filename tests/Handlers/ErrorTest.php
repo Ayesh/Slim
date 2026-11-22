@@ -8,10 +8,9 @@
 namespace Slim\Tests\Handlers;
 
 use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
 use ReflectionClass;
 use RuntimeException;
 use Slim\Handlers\Error;
@@ -21,7 +20,7 @@ use UnexpectedValueException;
 
 class ErrorTest extends TestCase
 {
-    public function errorProvider(): array {
+    public static function errorProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
@@ -34,9 +33,8 @@ class ErrorTest extends TestCase
 
     /**
      * Test invalid method returns the correct code and content type
-     *
-     * @dataProvider errorProvider
      */
+    #[DataProvider('errorProvider')]
     public function testError($acceptHeader, $contentType, $startOfBody): void {
         $error = new Error();
         $e = new Exception("Oops", 1, new Exception('Previous oops'));
@@ -51,9 +49,8 @@ class ErrorTest extends TestCase
 
     /**
      * Test invalid method returns the correct code and content type with details
-     *
-     * @dataProvider errorProvider
      */
+    #[DataProvider('errorProvider')]
     public function testErrorDisplayDetails($acceptHeader, $contentType, $startOfBody): void {
         $error = new Error(true);
         $e = new Exception('Oops', 1, new Exception('Opps before'));
@@ -67,13 +64,14 @@ class ErrorTest extends TestCase
     }
 
     public function testNotFoundContentType(): void {
-        $errorMock = $this->getMockBuilder(Error::class)->setMethods(['determineContentType'])->getMock();
-        $errorMock->method('determineContentType')
-            ->will($this->returnValue('unknown/type'));
+        $errorMock = $this->getMockBuilder(Error::class)->onlyMethods(['determineContentType'])->getMock();
+        $errorMock->expects($this->once())
+            ->method('determineContentType')
+            ->willReturn('unknown/type');
 
         $e = new Exception("Oops");
 
-        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $req = $this->createStub(Request::class);
         $this->expectException(UnexpectedValueException::class);
         $errorMock->__invoke($req, new Response(), $e);
     }
@@ -83,7 +81,7 @@ class ErrorTest extends TestCase
      * to the error log
      */
     public function testPreviousException(): void {
-        $error = $this->getMockBuilder(Error::class)->setMethods(['logError'])->getMock();
+        $error = $this->getMockBuilder(Error::class)->onlyMethods(['logError'])->getMock();
         $error->expects($this->once())->method('logError')->with(
             $this->logicalAnd(
                 $this->stringContains("Type: Exception" . PHP_EOL . "Message: Second Oops"),
@@ -104,7 +102,6 @@ class ErrorTest extends TestCase
     public function testRenderHtmlExceptionOrErrorTypeChecksParameter(): void {
         $class = new ReflectionClass(Error::class);
         $renderHtmlExceptionorError = $class->getMethod('renderHtmlExceptionOrError');
-        $renderHtmlExceptionorError->setAccessible(true);
 
         $this->expectException(RuntimeException::class);
 
@@ -119,7 +116,7 @@ class ErrorTest extends TestCase
      */
     protected function getRequest($method, $acceptHeader)
     {
-        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $req = $this->createMock(Request::class);
         $req->expects($this->once())->method('getHeaderLine')->willReturn($acceptHeader);
 
         return $req;

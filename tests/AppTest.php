@@ -90,7 +90,7 @@ class AppTest extends TestCase
         $route = $app->get($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('GET', $route->getMethods());
+        $this->assertContains('GET', $route->getMethods());
     }
 
     public function testPostRoute(): void {
@@ -102,7 +102,7 @@ class AppTest extends TestCase
         $route = $app->post($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('POST', $route->getMethods());
+        $this->assertContains('POST', $route->getMethods());
     }
 
     public function testPutRoute(): void {
@@ -114,7 +114,7 @@ class AppTest extends TestCase
         $route = $app->put($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('PUT', $route->getMethods());
+        $this->assertContains('PUT', $route->getMethods());
         $this->assertArrayNotHasKey('POST', $route->getMethods());
     }
 
@@ -127,7 +127,7 @@ class AppTest extends TestCase
         $route = $app->patch($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('PATCH', $route->getMethods());
+        $this->assertContains('PATCH', $route->getMethods());
     }
 
     public function testDeleteRoute(): void {
@@ -139,7 +139,7 @@ class AppTest extends TestCase
         $route = $app->delete($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('DELETE', $route->getMethods());
+        $this->assertContains('DELETE', $route->getMethods());
     }
 
     public function testOptionsRoute(): void {
@@ -151,7 +151,7 @@ class AppTest extends TestCase
         $route = $app->options($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('OPTIONS', $route->getMethods());
+        $this->assertContains('OPTIONS', $route->getMethods());
     }
 
     public function testAnyRoute(): void {
@@ -163,12 +163,12 @@ class AppTest extends TestCase
         $route = $app->any($path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('GET', $route->getMethods());
-        $this->assertArrayHasKey('POST', $route->getMethods());
-        $this->assertArrayHasKey('PUT', $route->getMethods());
-        $this->assertArrayHasKey('PATCH', $route->getMethods());
-        $this->assertArrayHasKey('DELETE', $route->getMethods());
-        $this->assertArrayHasKey('OPTIONS', $route->getMethods());
+        $this->assertContains('GET', $route->getMethods());
+        $this->assertContains('POST', $route->getMethods());
+        $this->assertContains('PUT', $route->getMethods());
+        $this->assertContains('PATCH', $route->getMethods());
+        $this->assertContains('DELETE', $route->getMethods());
+        $this->assertContains('OPTIONS', $route->getMethods());
     }
 
     public function testMapRoute(): void {
@@ -180,8 +180,8 @@ class AppTest extends TestCase
         $route = $app->map(['GET', 'POST'], $path, $callable);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('GET', $route->getMethods());
-        $this->assertArrayHasKey('POST', $route->getMethods());
+        $this->assertContains('GET', $route->getMethods());
+        $this->assertContains('POST', $route->getMethods());
     }
 
     public function testRedirectRoute(): void {
@@ -189,13 +189,11 @@ class AppTest extends TestCase
         $destination = '/bar';
 
         $app = new App();
-        $request = $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->createStub(ServerRequestInterface::class);
         $route = $app->redirect($source, $destination, 301);
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertArrayHasKey('GET', $route->getMethods());
+        $this->assertContains('GET', $route->getMethods());
 
         $response = $route->run($request, new Response());
         $this->assertEquals(301, $response->getStatusCode());
@@ -205,7 +203,7 @@ class AppTest extends TestCase
         $response = $routeWithDefaultStatus->run($request, new Response());
         $this->assertEquals(302, $response->getStatusCode());
 
-        $uri = $this->getMockBuilder(UriInterface::class)->getMock();
+        $uri = $this->createMock(UriInterface::class);
         $uri->expects($this->once())->method('__toString')->willReturn($destination);
 
         $routeToUri = $app->redirect($source, $uri);
@@ -223,8 +221,8 @@ class AppTest extends TestCase
         $app->add($mw);
 
         $app->callMiddlewareStack(
-            $this->getMockBuilder(ServerRequestInterface::class)->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder(ResponseInterface::class)->disableOriginalConstructor()->getMock()
+            $this->createStub(ServerRequestInterface::class),
+            $this->createStub(ResponseInterface::class)
         );
 
         $this->assertEquals($app, $bottom);
@@ -241,8 +239,8 @@ class AppTest extends TestCase
         $app->add($mw);
 
         $app->callMiddlewareStack(
-            $this->getMockBuilder(ServerRequestInterface::class)->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder(ResponseInterface::class)->disableOriginalConstructor()->getMock()
+            $this->createStub(ServerRequestInterface::class),
+            $this->createStub(ResponseInterface::class)
         );
 
         $this->assertSame($called, 1);
@@ -677,16 +675,16 @@ class AppTest extends TestCase
         $req = new Request('GET', $uri, $headers, $cookies, $serverParams, $body);
         $res = new Response();
 
-        $mock = $this->getMockBuilder('StdClass')->setMethods(['bar'])->getMock();
-
         $app = new App();
         $container = $app->getContainer();
-        $container['foo'] = static function () use ($mock, $res) {
-            $mock->method('bar')
-                ->willReturn(
-                    $res->write('Hello')
-                );
-            return $mock;
+        $container['foo'] = static function () use ($res) {
+            return new class ($res->write('Hello')) {
+                public function __construct(private ResponseInterface $response) {}
+
+                public function bar(): ResponseInterface {
+                    return $this->response;
+                }
+            };
         };
 
         $app->get('/foo', 'foo:bar');
@@ -713,7 +711,7 @@ class AppTest extends TestCase
         $req = new Request('GET', $uri, $headers, $cookies, $serverParams, $body);
         $res = new Response();
 
-        $mock = $this->getMockBuilder('StdClass')->getMock();
+        $mock = new \stdClass();
 
         $app = new App();
         $container = $app->getContainer();
@@ -1058,17 +1056,10 @@ class AppTest extends TestCase
     public function testRespondWithPaddedStreamFilterOutput(): void {
         $availableFilter = stream_get_filters();
 
-        if (PHP_VERSION_ID >= 70000) {
-            $filterName           = 'string.rot13';
-            $unfilterName         = 'string.rot13';
-            $specificFilterName   = 'string.rot13';
-            $specificUnfilterName = 'string.rot13';
-        } else {
-            $filterName           = 'mcrypt.*';
-            $unfilterName         = 'mdecrypt.*';
-            $specificFilterName   = 'mcrypt.rijndael-128';
-            $specificUnfilterName = 'mdecrypt.rijndael-128';
-        }
+        $filterName           = 'string.rot13';
+        $unfilterName         = 'string.rot13';
+        $specificFilterName   = 'string.rot13';
+        $specificUnfilterName = 'string.rot13';
 
         if (in_array($filterName, $availableFilter) && in_array($unfilterName, $availableFilter)) {
             $app = new App();
@@ -1128,12 +1119,12 @@ class AppTest extends TestCase
         $body_stream = fopen('php://temp', 'r+');
         $response = new Response();
         $body = $this->getMockBuilder(Body::class)
-            ->setMethods(["getSize"])
+            ->onlyMethods(["getSize"])
             ->setConstructorArgs([$body_stream])
             ->getMock();
         fwrite($body_stream, "Hello");
         rewind($body_stream);
-        $body->method("getSize")->willReturn(null);
+        $body->expects($this->atLeastOnce())->method("getSize")->willReturn(null);
         $response = $response->withBody($body);
         $app->respond($response);
         $this->expectOutputString("Hello");
@@ -1276,12 +1267,9 @@ class AppTest extends TestCase
         $resOut = $app->run(true);
 
         $this->assertEquals(500, $resOut->getStatusCode());
-        $this->assertNotRegExp('/.*middleware exception.*/', (string)$resOut);
+        $this->assertDoesNotMatchRegularExpression('/.*middleware exception.*/', (string)$resOut);
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testExceptionPhpErrorHandlerDoesNotDisplayErrorDetails(): void {
         $app = new App();
 
@@ -1314,7 +1302,7 @@ class AppTest extends TestCase
         $resOut = $app->run(true);
 
         $this->assertEquals(500, $resOut->getStatusCode());
-        $this->assertNotRegExp('/.*middleware exception.*/', (string)$resOut);
+        $this->assertDoesNotMatchRegularExpression('/.*middleware exception.*/', (string)$resOut);
     }
 
     /**
@@ -1374,9 +1362,6 @@ class AppTest extends TestCase
         $this->assertEquals("Failed", $res->getBody()->getContents());
     }
 
-    /**
-     * @requires PHP 7.0
-     */
     public function testRunThrowable(): void {
         $app = $this->appFactory();
         $app->get('/foo', function ($req, $res, $args) {
@@ -1502,12 +1487,11 @@ class AppTest extends TestCase
         $resOut = $app->run(true);
 
         $this->assertEquals(500, $resOut->getStatusCode());
-        $this->assertRegExp('/.*middleware exception.*/', (string)$resOut);
+        $this->assertMatchesRegularExpression('/.*middleware exception.*/', (string)$resOut);
     }
 
     public function testFinalize(): void {
         $method = new ReflectionMethod(App::class, 'finalize');
-        $method->setAccessible(true);
 
         $response = new Response();
         $response->getBody()->write('foo');
@@ -1520,7 +1504,6 @@ class AppTest extends TestCase
 
     public function testFinalizeWithoutBody(): void {
         $method = new ReflectionMethod(App::class, 'finalize');
-        $method->setAccessible(true);
 
         $response = $method->invoke(new App(), new Response(304));
 
@@ -1577,7 +1560,6 @@ class AppTest extends TestCase
 
     public function testOmittingContentLength(): void {
         $method = new ReflectionMethod(App::class, 'finalize');
-        $method->setAccessible(true);
 
         $response = new Response();
         $response->getBody()->write('foo');
@@ -1590,15 +1572,13 @@ class AppTest extends TestCase
         $this->assertFalse($response->hasHeader('Content-Length'));
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Unexpected data in output buffer
-     */
     public function testForUnexpectedDataInOutputBuffer(): void {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unexpected data in output buffer');
+
         $this->expectOutputString('test'); // needed to avoid risky test warning
         echo "test";
         $method = new ReflectionMethod(App::class, 'finalize');
-        $method->setAccessible(true);
 
         $response = new Response();
         $response->getBody()->write('foo');
@@ -1671,7 +1651,6 @@ class AppTest extends TestCase
 
     public function testIsEmptyResponseWithEmptyMethod(): void {
         $method = new ReflectionMethod(App::class, 'isEmptyResponse');
-        $method->setAccessible(true);
 
         $response = new Response();
         $response = $response->withStatus(204);
@@ -1682,10 +1661,9 @@ class AppTest extends TestCase
 
     public function testIsEmptyResponseWithoutEmptyMethod(): void {
         $method = new ReflectionMethod(App::class, 'isEmptyResponse');
-        $method->setAccessible(true);
 
         /** @var Response $response */
-        $response = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')
             ->willReturn(204);
 
@@ -1695,10 +1673,9 @@ class AppTest extends TestCase
 
     public function testIsHeadRequestWithGetRequest(): void {
         $method = new ReflectionMethod(App::class, 'isHeadRequest');
-        $method->setAccessible(true);
 
         /** @var Request $request */
-        $request = $this->getMockBuilder(RequestInterface::class)->getMock();
+        $request = $this->createStub(RequestInterface::class);
         $request->method('getMethod')
             ->willReturn('get');
 
@@ -1708,34 +1685,14 @@ class AppTest extends TestCase
 
     public function testIsHeadRequestWithHeadRequest(): void {
         $method = new ReflectionMethod(App::class, 'isHeadRequest');
-        $method->setAccessible(true);
 
         /** @var Request $request */
-        $request = $this->getMockBuilder(RequestInterface::class)->getMock();
+        $request = $this->createStub(RequestInterface::class);
         $request->method('getMethod')
             ->willReturn('head');
 
         $result = $method->invoke(new App(), $request);
         $this->assertTrue($result);
-    }
-
-    public function testHandlePhpError(): void {
-        $this->skipIfPhp70();
-        $method = new ReflectionMethod(App::class, 'handlePhpError');
-        $method->setAccessible(true);
-
-        $throwable = $this->getMock(
-            \Throwable::class,
-            ['getCode', 'getMessage', 'getFile', 'getLine', 'getTraceAsString', 'getPrevious']
-        );
-        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $res = new Response();
-
-        $res = $method->invoke(new App(), $throwable, $req, $res);
-
-        $this->assertSame(500, $res->getStatusCode());
-        $this->assertSame('text/html', $res->getHeaderLine('Content-Type'));
-        $this->assertEquals(0, strpos((string)$res->getBody(), '<html>'));
     }
 
     public function testExceptionOutputBufferingOff(): void {
@@ -1766,11 +1723,6 @@ end;
     }
 
     public function testExceptionOutputBufferingAppend(): void {
-        // If we are testing in HHVM skip this test due to a bug in HHVM
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('https://github.com/facebook/hhvm/issues/7803');
-        }
-
         $app = $this->appFactory();
         $app->getContainer()['settings']['outputBuffering'] = 'append';
         $app->get("/foo", function ($request, $response, $args) {
@@ -1784,11 +1736,6 @@ end;
     }
 
     public function testExceptionOutputBufferingPrepend(): void {
-        // If we are testing in HHVM skip this test due to a bug in HHVM
-        if (defined('HHVM_VERSION')) {
-            $this->markTestSkipped('https://github.com/facebook/hhvm/issues/7803');
-        }
-
         $app = $this->appFactory();
         $app->getContainer()['settings']['outputBuffering'] = 'prepend';
         $app->get("/foo", function ($request, $response, $args) {
@@ -1943,11 +1890,5 @@ end;
 
         $this->assertInstanceOf('\Psr\Http\Message\ResponseInterface', $resOut2);
         $this->assertEquals('3', (string)$resOut2->getBody());
-    }
-
-    protected function skipIfPhp70(): void {
-        if (PHP_VERSION_ID >= 70000) {
-            $this->markTestSkipped();
-        }
     }
 }

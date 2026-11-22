@@ -71,11 +71,9 @@ class ContainerTest extends TestCase
      * Test `get()` does not recast exceptions which are thrown in a factory closure
      */
     public function testGetWithErrorThrownByFactoryClosure(): void {
-        $invokable = $this->getMockBuilder('StdClass')->setMethods(['__invoke'])->getMock();
-        /** @var callable $invokable */
-        $invokable->expects($this->any())
-            ->method('__invoke')
-            ->will($this->throwException(new InvalidArgumentException()));
+        $invokable = static function (): never {
+            throw new InvalidArgumentException();
+        };
 
         $container = new Container;
         $container['foo'] =

@@ -32,14 +32,14 @@ class NonBufferedBody implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function detach(): void {
+    public function detach(): null {
         return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSize(): void {
+    public function getSize(): ?int {
         return null;
     }
 
@@ -123,7 +123,7 @@ class NonBufferedBody implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function getMetadata($key = null): void {
+    public function getMetadata($key = null): mixed {
         return null;
     }
 }

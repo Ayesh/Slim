@@ -9,7 +9,6 @@ namespace Slim\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use Slim\Container;
 use Slim\DeferredCallable;
 use Slim\Http\Body;
@@ -25,6 +24,8 @@ use Slim\Tests\Mocks\MiddlewareStub;
 
 class RouteTest extends TestCase
 {
+    use \Slim\Tests\Assets\ReadsAttributes;
+
     public function routeFactory(): Route {
         $methods = ['GET', 'POST'];
         $pattern = '/hello/{name}';
@@ -43,9 +44,9 @@ class RouteTest extends TestCase
         };
         $route = new Route($methods, $pattern, $callable);
 
-        $this->assertAttributeEquals($methods, 'methods', $route);
-        $this->assertAttributeEquals($pattern, 'pattern', $route);
-        $this->assertAttributeEquals($callable, 'callable', $route);
+        $this->assertEquals($methods, $this->readAttribute($route, 'methods'));
+        $this->assertEquals($pattern, $this->readAttribute($route, 'pattern'));
+        $this->assertEquals($callable, $this->readAttribute($route, 'callable'));
     }
 
     public function testGetMethodsReturnsArrayWhenContructedWithString(): void {
@@ -67,7 +68,7 @@ class RouteTest extends TestCase
     public function testGetCallable(): void {
         $callable = $this->routeFactory()->getCallable();
 
-        $this->assertInternalType('callable', $callable);
+        $this->assertIsCallable($callable);
     }
 
     public function testArgumentSetting(): void {
@@ -100,8 +101,8 @@ class RouteTest extends TestCase
         $route->finalize();
 
         $route->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->createStub('Psr\Http\Message\ServerRequestInterface'),
+            $this->createStub('Psr\Http\Message\ResponseInterface')
         );
 
         $this->assertEquals($route, $bottom);
@@ -120,8 +121,8 @@ class RouteTest extends TestCase
         $route->finalize();
 
         $route->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->createStub('Psr\Http\Message\ServerRequestInterface'),
+            $this->createStub('Psr\Http\Message\ResponseInterface')
         );
 
         $this->assertSame($called, 1);
@@ -142,8 +143,8 @@ class RouteTest extends TestCase
         $route->finalize();
 
         $route->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->createStub('Psr\Http\Message\ServerRequestInterface'),
+            $this->createStub('Psr\Http\Message\ResponseInterface')
         );
 
         $this->assertSame($called, 1);
@@ -164,7 +165,7 @@ class RouteTest extends TestCase
     public function testSetInvalidName(): void {
         $route = $this->routeFactory();
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
 
         $route->setName(false);
     }
@@ -187,7 +188,7 @@ class RouteTest extends TestCase
     public function testSetInvalidOutputBuffering(): void {
         $route = $this->routeFactory();
 
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
 
         $route->setOutputBuffering('invalid');
     }
@@ -280,10 +281,9 @@ class RouteTest extends TestCase
         $this->assertEquals('foo', (string)$response->getBody());
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testInvokeWithException(): void {
+        $this->expectException(\Exception::class);
+
         $callable = function ($req, $res, $args) {
             throw new Exception();
         };

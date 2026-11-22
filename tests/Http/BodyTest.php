@@ -9,12 +9,13 @@ namespace Slim\Tests\Http;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use ReflectionProperty;
 use Slim\Http\Body;
 
 class BodyTest extends TestCase
 {
+    use \Slim\Tests\Assets\ReadsAttributes;
+
     /**
      * @var string
      */
@@ -55,7 +56,6 @@ class BodyTest extends TestCase
         $this->stream = $this->resourceFactory();
         $body = new Body($this->stream);
         $bodyStream = new ReflectionProperty($body, 'stream');
-        $bodyStream->setAccessible(true);
 
         $this->assertSame($this->stream, $bodyStream->getValue($body));
     }
@@ -70,7 +70,7 @@ class BodyTest extends TestCase
         $this->stream = $this->resourceFactory();
         $body = new Body($this->stream);
 
-        $this->assertInternalType('array', $body->getMetadata());
+        $this->assertIsArray($body->getMetadata());
     }
 
     public function testGetMetadataKey(): void {
@@ -92,19 +92,14 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
 
         $bodyStream = new ReflectionProperty($body, 'stream');
-        $bodyStream->setAccessible(true);
 
         $bodyMetadata = new ReflectionProperty($body, 'meta');
-        $bodyMetadata->setAccessible(true);
 
         $bodyReadable = new ReflectionProperty($body, 'readable');
-        $bodyReadable->setAccessible(true);
 
         $bodyWritable = new ReflectionProperty($body, 'writable');
-        $bodyWritable->setAccessible(true);
 
         $bodySeekable = new ReflectionProperty($body, 'seekable');
-        $bodySeekable->setAccessible(true);
 
         $result = $body->detach();
 
@@ -136,7 +131,6 @@ class BodyTest extends TestCase
         $this->stream = $this->resourceFactory();
         $body = new Body($this->stream);
         $bodyStream = new ReflectionProperty($body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($body, null);
 
         $this->assertEquals('', (string)$body);
@@ -147,7 +141,7 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
         $body->close();
 
-        $this->assertAttributeEquals(null, 'stream', $body);
+        $this->assertEquals(null, $this->readAttribute($body, 'stream'));
         //$this->assertFalse($body->isAttached()); #1269
     }
 
@@ -162,7 +156,6 @@ class BodyTest extends TestCase
         $this->stream = $this->resourceFactory();
         $body = new Body($this->stream);
         $bodyStream = new ReflectionProperty($body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($body, null);
 
         $this->assertNull($body->getSize());
@@ -180,10 +173,9 @@ class BodyTest extends TestCase
         $this->stream = $this->resourceFactory();
         $body = new Body($this->stream);
         $bodyStream = new ReflectionProperty($body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($body, null);
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $body->tell();
     }
 
@@ -209,7 +201,6 @@ class BodyTest extends TestCase
         $this->stream = $this->resourceFactory();
         $body = new Body($this->stream);
         $bodyStream = new ReflectionProperty($body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($body, null);
 
         $this->assertTrue($body->eof());
@@ -291,7 +282,7 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
         $body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $body->seek(10);
     }
 
@@ -309,7 +300,7 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
         $body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $body->rewind();
     }
 
@@ -325,7 +316,7 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
         $body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $body->read(10);
     }
 
@@ -345,7 +336,7 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
         $body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $body->write('foo');
     }
 
@@ -362,7 +353,7 @@ class BodyTest extends TestCase
         $body = new Body($this->stream);
         $body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $body->getContents();
     }
 }

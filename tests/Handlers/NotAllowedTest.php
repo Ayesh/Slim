@@ -7,6 +7,7 @@
 
 namespace Slim\Tests\Handlers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Slim\Handlers\NotAllowed;
@@ -15,7 +16,7 @@ use Slim\Http\Response;
 
 class NotAllowedTest extends TestCase
 {
-    public function invalidMethodProvider(): array {
+    public static function invalidMethodProvider(): array {
         return [
             ['application/json', 'application/json', '{'],
             ['application/vnd.api+json', 'application/json', '{'],
@@ -28,9 +29,8 @@ class NotAllowedTest extends TestCase
 
     /**
      * Test invalid method returns the correct code and content type
-     *
-     * @dataProvider invalidMethodProvider
      */
+    #[DataProvider('invalidMethodProvider')]
     public function testInvalidMethod($acceptHeader, $contentType, $startOfBody): void {
         $notAllowed = new NotAllowed();
 
@@ -56,8 +56,9 @@ class NotAllowedTest extends TestCase
     }
 
     public function testNotFoundContentType(): void {
-        $errorMock = $this->getMockBuilder(NotAllowed::class)->setMethods(['determineContentType'])->getMock();
-        $errorMock->method('determineContentType')
+        $errorMock = $this->getMockBuilder(NotAllowed::class)->onlyMethods(['determineContentType'])->getMock();
+        $errorMock->expects($this->once())
+            ->method('determineContentType')
             ->willReturn('unknown/type');
 
         $this->expectException(\UnexpectedValueException::class);
@@ -71,9 +72,9 @@ class NotAllowedTest extends TestCase
      */
     protected function getRequest($method, $contentType = 'text/html')
     {
-        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $req->expects($this->once())->method('getMethod')->will($this->returnValue($method));
-        $req->expects($this->any())->method('getHeaderLine')->will($this->returnValue($contentType));
+        $req = $this->createMock(Request::class);
+        $req->expects($this->once())->method('getMethod')->willReturn($method);
+        $req->method('getHeaderLine')->willReturn($contentType);
 
         return $req;
     }

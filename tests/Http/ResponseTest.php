@@ -9,7 +9,6 @@ namespace Slim\Tests\Http;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use ReflectionProperty;
 use RuntimeException;
 use Slim\Http\Body;
@@ -18,12 +17,14 @@ use Slim\Http\Response;
 
 class ResponseTest extends TestCase
 {
+    use \Slim\Tests\Assets\ReadsAttributes;
+
     public function testConstructorWithDefaultArgs(): void {
         $response = new Response();
 
-        $this->assertAttributeEquals(200, 'status', $response);
-        $this->assertAttributeInstanceOf(Headers::class, 'headers', $response);
-        $this->assertAttributeInstanceOf('\Psr\Http\Message\StreamInterface', 'body', $response);
+        $this->assertEquals(200, $this->readAttribute($response, 'status'));
+        $this->assertInstanceOf(Headers::class, $this->readAttribute($response, 'headers'));
+        $this->assertInstanceOf('\Psr\Http\Message\StreamInterface', $this->readAttribute($response, 'body'));
     }
 
     public function testConstructorWithCustomArgs(): void {
@@ -31,9 +32,9 @@ class ResponseTest extends TestCase
         $body = new Body(fopen('php://temp', 'r+'));
         $response = new Response(404, $headers, $body);
 
-        $this->assertAttributeEquals(404, 'status', $response);
-        $this->assertAttributeSame($headers, 'headers', $response);
-        $this->assertAttributeSame($body, 'body', $response);
+        $this->assertEquals(404, $this->readAttribute($response, 'status'));
+        $this->assertSame($headers, $this->readAttribute($response, 'headers'));
+        $this->assertSame($body, $this->readAttribute($response, 'body'));
     }
 
     public function testDeepCopyClone(): void {
@@ -42,10 +43,10 @@ class ResponseTest extends TestCase
         $response = new Response(404, $headers, $body);
         $clone = clone $response;
 
-        $this->assertAttributeEquals('1.1', 'protocolVersion', $clone);
-        $this->assertAttributeEquals(404, 'status', $clone);
-        $this->assertAttributeNotSame($headers, 'headers', $clone);
-        $this->assertAttributeSame($body, 'body', $clone);
+        $this->assertEquals('1.1', $this->readAttribute($clone, 'protocolVersion'));
+        $this->assertEquals(404, $this->readAttribute($clone, 'status'));
+        $this->assertNotSame($headers, $this->readAttribute($clone, 'headers'));
+        $this->assertSame($body, $this->readAttribute($clone, 'body'));
     }
 
     public function testDisableSetter(): void {
@@ -58,7 +59,6 @@ class ResponseTest extends TestCase
     public function testGetStatusCode(): void {
         $response = new Response();
         $responseStatus = new ReflectionProperty($response, 'status');
-        $responseStatus->setAccessible(true);
         $responseStatus->setValue($response, '404');
 
         $this->assertEquals(404, $response->getStatusCode());
@@ -68,22 +68,20 @@ class ResponseTest extends TestCase
         $response = new Response();
         $clone = $response->withStatus(302);
 
-        $this->assertAttributeEquals(302, 'status', $clone);
+        $this->assertEquals(302, $this->readAttribute($clone, 'status'));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testWithStatusInvalidStatusCodeThrowsException(): void {
+        $this->expectException(\InvalidArgumentException::class);
+
         $response = new Response();
         $response->withStatus(800);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage ReasonPhrase must be a string
-     */
     public function testWithStatusInvalidReasonPhraseThrowsException(): void {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('ReasonPhrase must be a string');
+
         $response = new Response();
         $response->withStatus(200, null);
     }
@@ -100,11 +98,10 @@ class ResponseTest extends TestCase
         $this->assertEquals('Not Found', $response->getReasonPhrase());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage ReasonPhrase must be supplied for this code
-     */
     public function testMustSetReasonPhraseForUnrecognisedCode(): void {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('ReasonPhrase must be supplied for this code');
+
         $response = new Response();
         $response = $response->withStatus(199);
     }
@@ -148,7 +145,6 @@ class ResponseTest extends TestCase
     public function testIsEmpty(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 204);
 
         $this->assertTrue($response->isEmpty());
@@ -157,7 +153,6 @@ class ResponseTest extends TestCase
     public function testIsInformational(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 100);
 
         $this->assertTrue($response->isInformational());
@@ -166,7 +161,6 @@ class ResponseTest extends TestCase
     public function testIsOk(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 200);
 
         $this->assertTrue($response->isOk());
@@ -175,7 +169,6 @@ class ResponseTest extends TestCase
     public function testIsSuccessful(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 201);
 
         $this->assertTrue($response->isSuccessful());
@@ -184,7 +177,6 @@ class ResponseTest extends TestCase
     public function testIsRedirect(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 302);
 
         $this->assertTrue($response->isRedirect());
@@ -193,7 +185,6 @@ class ResponseTest extends TestCase
     public function testIsRedirection(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 308);
 
         $this->assertTrue($response->isRedirection());
@@ -202,7 +193,6 @@ class ResponseTest extends TestCase
     public function testIsForbidden(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 403);
 
         $this->assertTrue($response->isForbidden());
@@ -211,7 +201,6 @@ class ResponseTest extends TestCase
     public function testIsNotFound(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 404);
 
         $this->assertTrue($response->isNotFound());
@@ -220,7 +209,6 @@ class ResponseTest extends TestCase
     public function testIsBadRequest(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 400);
 
         $this->assertTrue($response->isBadRequest());
@@ -229,7 +217,6 @@ class ResponseTest extends TestCase
     public function testIsClientError(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 400);
 
         $this->assertTrue($response->isClientError());
@@ -238,7 +225,6 @@ class ResponseTest extends TestCase
     public function testIsServerError(): void {
         $response = new Response();
         $prop = new ReflectionProperty($response, 'status');
-        $prop->setAccessible(true);
         $prop->setValue($response, 503);
 
         $this->assertTrue($response->isServerError());
@@ -293,10 +279,9 @@ class ResponseTest extends TestCase
         $this->assertEquals($response->getStatusCode(), 201);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testWithInvalidJsonThrowsException(): void {
+        $this->expectException(\RuntimeException::class);
+
         $data = ['foo' => 'bar'.chr(233)];
         $this->assertEquals('bar'.chr(233), $data['foo']);
 

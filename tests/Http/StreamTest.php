@@ -8,7 +8,6 @@
 namespace Slim\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use RuntimeException;
 use Slim\Http\Stream;
 
@@ -56,28 +55,25 @@ class StreamTest extends TestCase
         $this->assertFalse($this->pipeStream->isSeekable());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testCannotSeekPipe(): void {
+        $this->expectException(\RuntimeException::class);
+
         $this->openPipeStream();
 
         $this->pipeStream->seek(0);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testCannotTellPipe(): void {
+        $this->expectException(\RuntimeException::class);
+
         $this->openPipeStream();
 
         $this->pipeStream->tell();
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testCannotRewindPipe(): void {
+        $this->expectException(\RuntimeException::class);
+
         $this->openPipeStream();
 
         $this->pipeStream->rewind();

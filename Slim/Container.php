@@ -11,6 +11,7 @@ use ArrayAccess;
 use Psr\Container\ContainerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use InvalidArgumentException;
+use PHPWatch\SimpleContainer\Exception\SimpleContainerException;
 use Slim\Exception\ContainerException as SlimContainerException;
 use Slim\Exception\ContainerValueNotFoundException;
 
@@ -98,8 +99,7 @@ class Container extends \PHPWatch\SimpleContainer\Container
      * @throws ContainerValueNotFoundException  No entry was found for this identifier.
      * @throws ContainerExceptionInterface      Error while retrieving the entry.
      */
-    public function get($id)
-    {
+    public function get($id): mixed {
         if (!$this->offsetExists($id)) {
             throw new ContainerValueNotFoundException(sprintf('Identifier "%s" is not defined.', $id));
         }
@@ -109,7 +109,7 @@ class Container extends \PHPWatch\SimpleContainer\Container
             if ($this->exceptionThrownByContainer($exception)) {
                 throw new SlimContainerException(
                     sprintf('Container error while retrieving "%s"', $id),
-                    null,
+                    0,
                     $exception
                 );
             } else {
@@ -120,16 +120,14 @@ class Container extends \PHPWatch\SimpleContainer\Container
 
     /**
      * Tests whether an exception needs to be recast for compliance with psr/container.  This will be if the
-     * exception was thrown by Pimple.
+     * exception was thrown by the underlying container.
      *
      * @param InvalidArgumentException $exception
      *
      * @return bool
      */
     private function exceptionThrownByContainer(InvalidArgumentException $exception): bool {
-        $trace = $exception->getTrace()[0];
-
-        return $trace['class'] === \PHPWatch\SimpleContainer\Container::class && $trace['function'] === 'offsetGet';
+        return $exception instanceof SimpleContainerException;
     }
 
     /**

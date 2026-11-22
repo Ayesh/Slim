@@ -8,7 +8,6 @@
 namespace Slim\Tests;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use RuntimeException;
 use Slim\Http\Body;
 use Slim\Http\Headers;
@@ -29,8 +28,8 @@ class MiddlewareAwareTest extends TestCase
         });
 
         $stack->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->createStub('Psr\Http\Message\ServerRequestInterface'),
+            $this->createStub('Psr\Http\Message\ResponseInterface')
         );
 
         $this->assertSame($stack, $bottom);
@@ -99,10 +98,9 @@ class MiddlewareAwareTest extends TestCase
         $this->assertEquals('In2In1CenterOut1Out2', (string)$res->getBody());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testMiddlewareBadReturnValue(): void {
+        $this->expectException(\RuntimeException::class);
+
         // Build middleware stack
         $stack = new Stackable;
         $stack->add(function ($req, $res, $next) {
@@ -139,8 +137,8 @@ class MiddlewareAwareTest extends TestCase
         });
 
         $stack->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->createStub('Psr\Http\Message\ServerRequestInterface'),
+            $this->createStub('Psr\Http\Message\ResponseInterface')
         );
 
         $this->assertSame([$stack, 'testMiddlewareKernel'], $bottom);
@@ -155,17 +153,17 @@ class MiddlewareAwareTest extends TestCase
             });
             return $resp;
         });
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $stack->callMiddlewareStack(
-            $this->getMockBuilder('Psr\Http\Message\ServerRequestInterface')->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder('Psr\Http\Message\ResponseInterface')->disableOriginalConstructor()->getMock()
+            $this->createStub('Psr\Http\Message\ServerRequestInterface'),
+            $this->createStub('Psr\Http\Message\ResponseInterface')
         );
     }
 
     public function testSeedTwiceThrowException(): void {
         $stack = new Stackable;
         $stack->alternativeSeed();
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $stack->alternativeSeed();
     }
 }

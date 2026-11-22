@@ -8,7 +8,6 @@
 namespace Slim\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use Slim\Http\Environment;
 use Slim\Interfaces\CollectionInterface;
 

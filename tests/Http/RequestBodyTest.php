@@ -8,12 +8,13 @@
 namespace Slim\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use ReflectionProperty;
 use Slim\Http\RequestBody;
 
 class RequestBodyTest extends TestCase
 {
+    use \Slim\Tests\Assets\ReadsAttributes;
+
     /** @var string */
     // @codingStandardsIgnoreStart
     protected $text = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
@@ -62,20 +63,18 @@ class RequestBodyTest extends TestCase
 
     public function testConstructorAttachesStream(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
-        $bodyStream->setAccessible(true);
 
-        $this->assertInternalType('resource', $bodyStream->getValue($this->body));
+        $this->assertIsResource($bodyStream->getValue($this->body));
     }
 
     public function testConstructorSetsMetadata(): void {
         $bodyMetadata = new ReflectionProperty($this->body, 'meta');
-        $bodyMetadata->setAccessible(true);
 
-        $this->assertInternalType('array', $bodyMetadata->getValue($this->body));
+        $this->assertIsArray($bodyMetadata->getValue($this->body));
     }
 
     public function testGetMetadata(): void {
-        $this->assertInternalType('array', $this->body->getMetadata());
+        $this->assertIsArray($this->body->getMetadata());
     }
 
     public function testGetMetadataKey(): void {
@@ -88,23 +87,18 @@ class RequestBodyTest extends TestCase
 
     public function testDetach(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
-        $bodyStream->setAccessible(true);
 
         $bodyMetadata = new ReflectionProperty($this->body, 'meta');
-        $bodyMetadata->setAccessible(true);
 
         $bodyReadable = new ReflectionProperty($this->body, 'readable');
-        $bodyReadable->setAccessible(true);
 
         $bodyWritable = new ReflectionProperty($this->body, 'writable');
-        $bodyWritable->setAccessible(true);
 
         $bodySeekable = new ReflectionProperty($this->body, 'seekable');
-        $bodySeekable->setAccessible(true);
 
         $result = $this->body->detach();
 
-        $this->assertInternalType('resource', $result);
+        $this->assertIsResource($result);
         $this->assertNull($bodyStream->getValue($this->body));
         $this->assertNull($bodyMetadata->getValue($this->body));
         $this->assertNull($bodyReadable->getValue($this->body));
@@ -124,7 +118,6 @@ class RequestBodyTest extends TestCase
 
     public function testToStringDetached(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
 
         $this->assertEquals('', (string)$this->body);
@@ -133,12 +126,12 @@ class RequestBodyTest extends TestCase
     public function testClose(): void {
         $this->body->close();
 
-        $this->assertAttributeEquals(null, 'stream', $this->body);
+        $this->assertEquals(null, $this->readAttribute($this->body, 'stream'));
         $this->assertFalse($this->body->isReadable());
         $this->assertFalse($this->body->isWritable());
         $this->assertEquals('', (string)$this->body);
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException('RuntimeException');
         $this->body->tell();
     }
 
@@ -148,7 +141,6 @@ class RequestBodyTest extends TestCase
 
     public function testGetSizeDetached(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
 
         $this->assertNull($this->body->getSize());
@@ -162,10 +154,9 @@ class RequestBodyTest extends TestCase
 
     public function testTellDetachedThrowsRuntimeException(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->body->tell();
     }
 
@@ -185,7 +176,6 @@ class RequestBodyTest extends TestCase
 
     public function testEofDetached(): void {
         $bodyStream = new ReflectionProperty($this->body, 'stream');
-        $bodyStream->setAccessible(true);
         $bodyStream->setValue($this->body, null);
 
         $this->assertTrue($this->body->eof());
@@ -232,7 +222,7 @@ class RequestBodyTest extends TestCase
     public function testSeekDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->body->seek(10);
     }
 
@@ -246,7 +236,7 @@ class RequestBodyTest extends TestCase
     public function testRewindDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->body->rewind();
     }
 
@@ -257,7 +247,7 @@ class RequestBodyTest extends TestCase
     public function testReadDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->body->read(10);
     }
 
@@ -273,7 +263,7 @@ class RequestBodyTest extends TestCase
     public function testWriteDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->body->write('foo');
     }
 
@@ -286,7 +276,7 @@ class RequestBodyTest extends TestCase
     public function testGetContentsDetachedThrowsRuntimeException(): void {
         $this->body->detach();
 
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->body->getContents();
     }
 }

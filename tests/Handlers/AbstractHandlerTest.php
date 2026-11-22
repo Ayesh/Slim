@@ -15,11 +15,11 @@ use Slim\Http\Request;
 class AbstractHandlerTest extends TestCase
 {
     public function testHalfValidContentType(): void {
-        $req = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $req = $this->createStub(Request::class);
 
-        $req->expects($this->any())->method('getHeaderLine')->will($this->returnValue('unknown/+json'));
+        $req->method('getHeaderLine')->willReturn('unknown/+json');
 
-        $abstractHandler = $this->getMockForAbstractClass(AbstractHandler::class);
+        $abstractHandler = new class extends AbstractHandler {};
 
         $newTypes = [
             'application/xml',
@@ -30,11 +30,9 @@ class AbstractHandlerTest extends TestCase
         $class = new ReflectionClass(AbstractHandler::class);
 
         $reflectionProperty = $class->getProperty('knownContentTypes');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($abstractHandler, $newTypes);
 
         $method = $class->getMethod('determineContentType');
-        $method->setAccessible(true);
 
         $return = $method->invoke($abstractHandler, $req);
 
@@ -46,21 +44,17 @@ class AbstractHandlerTest extends TestCase
      * if it's not the first in the list.
      */
     public function testAcceptableMediaTypeIsNotFirstInList(): void {
-        $request = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $request = $this->createStub(Request::class);
 
-        $request->expects($this->any())
-            ->method('getHeaderLine')
+        $request->method('getHeaderLine')
             ->willReturn('text/plain,text/html');
 
         // provide access to the determineContentType() as it's a protected method
         $class = new ReflectionClass(AbstractHandler::class);
         $method = $class->getMethod('determineContentType');
-        $method->setAccessible(true);
 
         // use a mock object here as AbstractHandler cannot be directly instantiated
-        $abstractHandler = $this->getMockForAbstractClass(AbstractHandler::class);
+        $abstractHandler = new class extends AbstractHandler {};
 
         // call determineContentType()
         $return = $method->invoke($abstractHandler, $request);

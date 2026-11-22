@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use RuntimeException;
+use Stringable;
 use Slim\Interfaces\Http\HeadersInterface;
 
 /**
@@ -188,7 +189,7 @@ class Response extends Message implements ResponseInterface
     public function withStatus($code, $reasonPhrase = ''): static {
         $code = $this->filterStatus($code);
 
-        if (!is_string($reasonPhrase) && !method_exists($reasonPhrase, '__toString')) {
+        if (!is_string($reasonPhrase) && !$reasonPhrase instanceof Stringable) {
             throw new InvalidArgumentException('ReasonPhrase must be a string');
         }
 

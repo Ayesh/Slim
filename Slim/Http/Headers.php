@@ -148,7 +148,7 @@ class Headers extends Collection implements HeadersInterface
      *
      * @return string
      */
-    public function getOriginalKey($key, $default = null): string {
+    public function getOriginalKey($key, $default = null): mixed {
         if ($this->has($key)) {
             return parent::get($this->normalizeKey($key))['originalKey'];
         }

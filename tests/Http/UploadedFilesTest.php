@@ -7,8 +7,9 @@
 
 namespace Slim\Tests\Http;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_TestCase;
 use RuntimeException;
 use Slim\Http\Environment;
 use Slim\Http\Headers;
@@ -58,9 +59,8 @@ class UploadedFilesTest extends TestCase
     /**
      * @param array $input    The input array to parse.
      * @param array $expected The expected normalized output.
-     *
-     * @dataProvider providerCreateFromEnvironment
      */
+    #[DataProvider('providerCreateFromEnvironment')]
     public function testCreateFromEnvironmentFromFilesSuperglobal(array $input, array $expected): void {
         $_FILES = $input;
 
@@ -69,11 +69,11 @@ class UploadedFilesTest extends TestCase
     }
 
     /**
-     * @param array $input The input array to parse.
-     *
-     * @dataProvider providerCreateFromEnvironment
+     * @param array $input     The input array to parse.
+     * @param array $_expected Unused; the normalized form is not applied to user data.
      */
-    public function testCreateFromEnvironmentFromUserData(array $input): void {
+    #[DataProvider('providerCreateFromEnvironment')]
+    public function testCreateFromEnvironmentFromUserData(array $input, array $_expected): void {
         //If slim.files provided - it will return what was provided
         $userData['slim.files'] = $input;
 
@@ -119,12 +119,11 @@ class UploadedFilesTest extends TestCase
     }
 
     /**
-     * @depends testConstructor
-     *
      * @param UploadedFile $uploadedFile
      *
      * @return UploadedFile
      */
+    #[Depends('testConstructor')]
     public function testGetStream(UploadedFile $uploadedFile): UploadedFile {
         $stream = $uploadedFile->getStream();
         $this->assertEquals(true, $uploadedFile->getStream() instanceof Stream);
@@ -134,24 +133,22 @@ class UploadedFilesTest extends TestCase
     }
 
     /**
-     * @depends testConstructor
-     *
      * @param UploadedFile $uploadedFile
      */
+    #[Depends('testConstructor')]
     public function testMoveToNotWritable(UploadedFile $uploadedFile): void {
         $tempName = uniqid('file-', true);
         $path = 'some_random_dir' . DIRECTORY_SEPARATOR . $tempName;
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $uploadedFile->moveTo($path);
     }
 
     /**
-     * @depends testConstructor
-     *
      * @param UploadedFile $uploadedFile
      *
      * @return UploadedFile
      */
+    #[Depends('testConstructor')]
     public function testMoveTo(UploadedFile $uploadedFile): UploadedFile {
         $tempName = uniqid('file-', true);
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tempName;
@@ -165,13 +162,12 @@ class UploadedFilesTest extends TestCase
     }
 
     /**
-     * @depends testMoveTo
-     *
      * @param UploadedFile $uploadedFile
-     *
-     * @expectedException RuntimeException
      */
+    #[Depends('testMoveTo')]
     public function testMoveToCannotBeDoneTwice(UploadedFile $uploadedFile): void {
+        $this->expectException(\RuntimeException::class);
+
         $tempName = uniqid('file-', true);
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tempName;
         $uploadedFile->moveTo($path);
@@ -184,12 +180,12 @@ class UploadedFilesTest extends TestCase
     /**
      * This test must run after testMoveTo
      *
-     * @depends testConstructor
      *
      * @param UploadedFile $uploadedFile
      */
+    #[Depends('testConstructor')]
     public function testMoveToAgain(UploadedFile $uploadedFile): void {
-        $this->setExpectedException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $tempName = uniqid('file-', true);
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $tempName;
@@ -199,12 +195,12 @@ class UploadedFilesTest extends TestCase
     /**
      * This test must run after testMoveTo
      *
-     * @depends testConstructor
      *
      * @param UploadedFile $uploadedFile
      */
+    #[Depends('testConstructor')]
     public function testMovedStream($uploadedFile): void {
-        $this->setExpectedException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $uploadedFile->getStream();
     }
@@ -218,10 +214,10 @@ class UploadedFilesTest extends TestCase
         $movedFileContents = ob_get_clean();
 
         $this->assertEquals($contents, $movedFileContents);
-        $this->assertFileNotExists($uploadedFile->file);
+        $this->assertFileDoesNotExist($uploadedFile->file);
     }
 
-    public function providerCreateFromEnvironment(): array {
+    public static function providerCreateFromEnvironment(): array {
         return [
             // no nest: <input name="avatar" type="file">
             [

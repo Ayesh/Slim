@@ -9,8 +9,6 @@ namespace Slim\Tests\Http;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_TestCase;
 use Slim\Http\Body;
 use Slim\Http\Headers;
 use Slim\Tests\Mocks\MessageStub;
@@ -31,10 +29,9 @@ class MessageTest extends TestCase
         $this->assertEquals('1.0', $clone->protocolVersion);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testWithProtocolVersionInvalidThrowsException(): void {
+        $this->expectException(\InvalidArgumentException::class);
+
         $message = new MessageStub();
         $message->withProtocolVersion('3.0');
     }
@@ -157,13 +154,10 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @return PHPUnit_Framework_MockObject_MockObject|Body
+     * @return Body
      */
     protected function getBody()
     {
-        return $this
-            ->getMockBuilder(Body::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return $this->createStub(Body::class);
     }
 }
